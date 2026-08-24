@@ -105,6 +105,22 @@ Authorization failures return HTTP 403.
 
 Authentication failures return HTTP 401.
 
+
+## Password reset flow
+
+1. Backend requests a Supabase recovery email.
+2. User opens the recovery link.
+3. Frontend callback establishes the Supabase recovery session.
+4. Frontend sends the recovery session access token and refresh token to:
+
+   POST /api/v1/auth/reset-password
+
+5. Node validates the authenticated identity and updates the password.
+
+The frontend callback is required to establish the Supabase recovery session.
+The backend does not implement a custom password-reset token format.
+
+
 ## Storage contract
 
 Private documents are stored through controlled storage operations.

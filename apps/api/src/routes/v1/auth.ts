@@ -1,6 +1,7 @@
 import { Router, type Response } from "express";
 
 import { requireAuthentication } from "../../middleware/authentication.js";
+import { loadApplicationIdentity } from "../../middleware/application-identity.js";
 import { validateBody } from "../../middleware/validation.js";
 import {
     emailRequestSchema,
@@ -12,7 +13,6 @@ import {
     type RegistrationInput,
     type ResetPasswordInput
 } from "../../schemas/authentication.js";
-import { resolveApplicationIdentity } from "../../services/application-identity.js";
 import {
     AuthenticationServiceError,
     login,
@@ -139,37 +139,27 @@ router.post(
     }
 );
 
-router.get("/me", requireAuthentication, async (req, res) => {
-    const authentication = req.authentication;
+router.get("/me", requireAuthentication, loadApplicationIdentity, (req, res) => {
+    const identity = req.identity;
 
-    if (!authentication) {
-        res.status(401).json({
-            error: "UNAUTHORIZED",
-            message: "A valid Bearer access token is required."
-        });
-        return;
-    }
-
-    try {
-        const identity = await resolveApplicationIdentity(
-            authentication.user,
-            authentication.accessToken
-        );
-
-        res.status(200).json({
-            user: {
-                id: identity.userId,
-                email: identity.email,
-                profile: identity.profile
-            },
-            memberships: identity.memberships
-        });
-    } catch {
+    if (!identity) {
         res.status(503).json({
             error: "APPLICATION_IDENTITY_UNAVAILABLE",
             message: "Application identity is temporarily unavailable."
         });
+        return;
     }
+
+    res.status(200).json({
+        user: {
+            id: identity.userId,
+            email: identity.email,
+            accountType: identity.accountType,
+            platformRoles: identity.platformRoles,
+            profile: identity.profile
+        },
+        memberships: identity.memberships
+    });
 });
 
 export { router as authRouter };

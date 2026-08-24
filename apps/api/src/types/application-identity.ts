@@ -1,5 +1,11 @@
 export type OrganizationRole = "owner" | "admin" | "reviewer" | "member";
 
+export type OrganizationType = "brand" | "retailer" | "dispensary";
+
+export type UserAccountType = "standard" | "sales_rep";
+
+export type PlatformRole = "admin";
+
 export type MembershipStatus =
     | "active"
     | "invited"
@@ -14,6 +20,7 @@ export interface ApplicationProfile {
 export interface ApplicationMembership {
     organizationId: string;
     organizationName: string;
+    organizationType: OrganizationType | null;
     role: OrganizationRole;
     status: MembershipStatus;
 }
@@ -21,6 +28,8 @@ export interface ApplicationMembership {
 export interface ApplicationIdentity {
     userId: string;
     email: string | null;
+    accountType: UserAccountType | null;
+    platformRoles: PlatformRole[];
     profile: ApplicationProfile | null;
     memberships: ApplicationMembership[];
 }
