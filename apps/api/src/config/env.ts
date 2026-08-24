@@ -20,6 +20,8 @@ const envSchema = z.object({
 
     SUPABASE_ANON_KEY: z.string().min(1),
 
+    PASSWORD_RESET_REDIRECT_URL: z.url(),
+
     SUPABASE_SERVICE_ROLE_KEY: optionalString,
 
     DATABASE_URL: optionalString,
