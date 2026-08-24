@@ -1,5 +1,7 @@
 ﻿import { Router } from "express";
 
+import { authRouter } from "./auth.js";
+
 const router = Router();
 
 router.get("/", (_req, res) => {
@@ -9,5 +11,7 @@ router.get("/", (_req, res) => {
         status: "ok"
     });
 });
+
+router.use("/auth", authRouter);
 
 export { router as v1Router };

@@ -16,12 +16,9 @@ const envSchema = z.object({
 
     WEB_URL: z.url().default("http://localhost:5173"),
 
-    SUPABASE_URL: z.preprocess(
-        (value) => (value === "" ? undefined : value),
-        z.url().optional()
-    ),
+    SUPABASE_URL: z.url(),
 
-    SUPABASE_ANON_KEY: optionalString,
+    SUPABASE_ANON_KEY: z.string().min(1),
 
     SUPABASE_SERVICE_ROLE_KEY: optionalString,
 
