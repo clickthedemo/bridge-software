@@ -6,7 +6,10 @@ import { supabase } from "../lib/supabase.js";
 declare global {
     namespace Express {
         interface Request {
-            authenticatedUser?: User;
+            authentication?: {
+                user: User;
+                accessToken: string;
+            };
         }
     }
 }
@@ -34,7 +37,10 @@ export const requireAuthentication: RequestHandler = async (req, res, next) => {
             return;
         }
 
-        req.authenticatedUser = data.user;
+        req.authentication = {
+            user: data.user,
+            accessToken
+        };
         next();
     } catch {
         res.status(401).json(unauthorized);

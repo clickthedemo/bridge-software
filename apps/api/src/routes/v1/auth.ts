@@ -1,13 +1,14 @@
 import { Router } from "express";
 
 import { requireAuthentication } from "../../middleware/authentication.js";
+import { resolveApplicationIdentity } from "../../services/application-identity.js";
 
 const router = Router();
 
-router.get("/me", requireAuthentication, (req, res) => {
-    const user = req.authenticatedUser;
+router.get("/me", requireAuthentication, async (req, res) => {
+    const authentication = req.authentication;
 
-    if (!user) {
+    if (!authentication) {
         res.status(401).json({
             error: "UNAUTHORIZED",
             message: "A valid Bearer access token is required."
@@ -15,15 +16,26 @@ router.get("/me", requireAuthentication, (req, res) => {
         return;
     }
 
-    res.status(200).json({
-        user: {
-            id: user.id,
-            email: user.email ?? null,
-            emailConfirmedAt: user.email_confirmed_at ?? null,
-            lastSignInAt: user.last_sign_in_at ?? null,
-            createdAt: user.created_at
-        }
-    });
+    try {
+        const identity = await resolveApplicationIdentity(
+            authentication.user,
+            authentication.accessToken
+        );
+
+        res.status(200).json({
+            user: {
+                id: identity.userId,
+                email: identity.email,
+                profile: identity.profile
+            },
+            memberships: identity.memberships
+        });
+    } catch {
+        res.status(503).json({
+            error: "APPLICATION_IDENTITY_UNAVAILABLE",
+            message: "Application identity is temporarily unavailable."
+        });
+    }
 });
 
 export { router as authRouter };

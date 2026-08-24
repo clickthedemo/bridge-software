@@ -1,11 +1,6 @@
 ﻿import type { Request, RequestHandler } from "express";
 
-export type ProductRole =
-    | "brand"
-    | "retailer"
-    | "dispensary"
-    | "sales_rep"
-    | "admin";
+import type { ApplicationIdentity } from "../types/application-identity.js";
 
 export type Permission =
     | "organization:read"
@@ -20,14 +15,8 @@ export type Permission =
     | "promotion:publish"
     | "audit:read";
 
-export interface Identity {
-    userId: string;
-    role: ProductRole;
-    organizationIds: string[];
-}
-
 export interface AuthenticatedRequest extends Request {
-    identity?: Identity;
+    identity?: ApplicationIdentity;
 }
 
 export const requirePermission = (
