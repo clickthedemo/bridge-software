@@ -106,6 +106,27 @@ Authorization failures return HTTP 403.
 Authentication failures return HTTP 401.
 
 
+## Organization onboarding and access
+
+Authenticated users create an organization through:
+
+    POST /api/v1/organizations
+
+The request supplies only the organization name and organization type. A trusted PostgreSQL function derives the owner from `auth.uid()` and creates both the organization and its active owner membership in one transaction. The owner-membership invariant is therefore atomic: the API never accepts a successfully created organization without its initial owner membership.
+
+Organization reads and updates use the protected pipeline:
+
+    requireAuthentication
+      -> loadApplicationIdentity
+      -> validate organization scope
+      -> requirePermission
+      -> user-scoped RLS-backed service
+
+List responses are projected from the user's active resolved memberships. Detail and update operations validate the organization UUID and evaluate permissions for that exact organization. Permissions in one organization do not authorize access to another organization.
+
+After onboarding completes, a subsequent `GET /api/v1/auth/me` resolves the new owner membership from database truth. Request identity is not mutated to simulate onboarding success.
+
+
 ## Password reset flow
 
 1. Backend requests a Supabase recovery email.
