@@ -18,6 +18,23 @@ export const createPublicSupabaseClient = (): SupabaseClient => {
     });
 };
 
+export class SupabaseAdminNotConfiguredError extends Error {
+    constructor() {
+        super("Supabase admin client is not configured.");
+        this.name = "SupabaseAdminNotConfiguredError";
+    }
+}
+
+export const createAdminSupabaseClient = (): SupabaseClient => {
+    if (!env.SUPABASE_SERVICE_ROLE_KEY) {
+        throw new SupabaseAdminNotConfiguredError();
+    }
+
+    return createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, {
+        auth: serverAuthOptions
+    });
+};
+
 export const createUserScopedSupabaseClient = (
     accessToken: string
 ): SupabaseClient => {

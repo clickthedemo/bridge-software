@@ -1,6 +1,7 @@
 ﻿import { Router } from "express";
 
 import { authRouter } from "./auth.js";
+import { einRouter } from "./ein.js";
 import { organizationsRouter } from "./organizations.js";
 
 const router = Router();
@@ -15,5 +16,6 @@ router.get("/", (_req, res) => {
 
 router.use("/auth", authRouter);
 router.use("/organizations", organizationsRouter);
+router.use(einRouter);
 
 export { router as v1Router };

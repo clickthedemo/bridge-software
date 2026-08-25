@@ -19,7 +19,8 @@ export const PERMISSIONS = [
     "document:review",
     "audit:read",
     "admin:verification_queue",
-    "admin:verification_review"
+    "admin:verification_review",
+    "ein:reveal"
 ] as const;
 
 export type Permission = (typeof PERMISSIONS)[number];
@@ -49,7 +50,8 @@ const rolePermissions: Record<OrganizationRole, ReadonlySet<Permission>> = {
 
 const platformPermissions: ReadonlySet<Permission> = new Set([
     "admin:verification_queue",
-    "admin:verification_review"
+    "admin:verification_review",
+    "ein:reveal"
 ]);
 
 export const hasPermission = (
@@ -95,6 +97,44 @@ export const requirePermission = (
             !req.identity ||
             !hasPermission(req.identity, permission, organizationId)
         ) {
+            res.status(403).json({
+                error: "FORBIDDEN",
+                message: "You do not have permission to perform this action."
+            });
+            return;
+        }
+
+        next();
+    };
+};
+
+export const requireAnyOrganizationPermission = (
+    permission: Permission,
+    platformPermission?: Permission
+): RequestHandler => {
+    return (req, res, next) => {
+        if (!req.authentication) {
+            res.status(401).json({
+                error: "UNAUTHORIZED",
+                message: "A valid Bearer access token is required."
+            });
+            return;
+        }
+
+        const identity = req.identity;
+        const allowed =
+            identity !== undefined &&
+            ((platformPermission !== undefined &&
+                hasPermission(identity, platformPermission)) ||
+                identity.memberships.some((membership) =>
+                    hasPermission(
+                        identity,
+                        permission,
+                        membership.organizationId
+                    )
+                ));
+
+        if (!allowed) {
             res.status(403).json({
                 error: "FORBIDDEN",
                 message: "You do not have permission to perform this action."
