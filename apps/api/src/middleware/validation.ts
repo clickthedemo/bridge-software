@@ -42,3 +42,27 @@ export const validateParams = (schema: ZodType): RequestHandler => {
         next();
     };
 };
+
+export const validateQuery = (
+    schema: ZodType,
+    localsKey = "validatedQuery"
+): RequestHandler => {
+    return (req, res, next) => {
+        const result = schema.safeParse(req.query);
+
+        if (!result.success) {
+            res.status(400).json({
+                error: "VALIDATION_ERROR",
+                message: "The request query is invalid.",
+                details: result.error.issues.map((issue) => ({
+                    path: issue.path.join("."),
+                    message: issue.message
+                }))
+            });
+            return;
+        }
+
+        res.locals[localsKey] = result.data;
+        next();
+    };
+};

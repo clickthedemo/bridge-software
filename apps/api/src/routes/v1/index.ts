@@ -1,5 +1,6 @@
 ﻿import { Router } from "express";
 
+import { adminVerificationRouter } from "./admin-verification.js";
 import { authRouter } from "./auth.js";
 import { einRouter } from "./ein.js";
 import { organizationsRouter } from "./organizations.js";
@@ -15,6 +16,7 @@ router.get("/", (_req, res) => {
 });
 
 router.use("/auth", authRouter);
+router.use("/admin", adminVerificationRouter);
 router.use("/organizations", organizationsRouter);
 router.use(einRouter);
 

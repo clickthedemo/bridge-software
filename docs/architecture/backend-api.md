@@ -159,6 +159,23 @@ The request transaction remains user-scoped and rechecks tenant reviewer/platfor
 `EIN_ENCRYPTION_KEY` is a server-only base64-encoded 32-byte key, and `EIN_ENCRYPTION_KEY_VERSION` identifies the active version. Sensitive EIN operations fail closed when the configured key is unavailable or invalid. Each encrypted row stores its key version; the Node key resolver is deliberately version-aware so a future key map or AWS KMS integration can support rotation without changing the database model.
 
 
+## Admin verification queue
+
+The global verification queue is available only to authenticated users whose application identity contains platform role `admin`. Organization owner/admin/reviewer memberships do not grant global access. The routes are:
+
+    GET /api/v1/admin/verification-queue
+    GET /api/v1/admin/verification-cases/:verificationCaseId
+    POST /api/v1/admin/verification-items/:verificationItemId/review
+
+The queue supports optional `status`, `itemType`, `organizationId`, and `limit` filters, with a maximum limit of 100. Without an explicit status filter it includes `pending`, `in_review`, `verification_requested`, and `correction_required`. `verified` and `not_applicable` appear only when explicitly requested for historical inspection. `rejected` is omitted from the default queue but remains available through an explicit status filter and case detail, and may be re-reviewed into a different supported decision.
+
+Queue and case-detail reads use service-role-only database functions that independently verify the supplied actor exists and has platform role `admin`. These functions project only review-safe fields instead of granting broad table access. Queue responses contain case, item, organization, business, status, method, and review timestamps. Detail responses add safe document metadata, immutable item history, EIN last four, cannabis-license lookup summaries, and provider-attempt summaries. They exclude full EINs, encrypted EIN fields, storage locations, raw provider responses, and secrets. Full EIN access remains a separate, explicit, audited `POST /api/v1/businesses/:businessId/ein/reveal` action guarded by `ein:reveal`.
+
+Review requests accept only `verified`, `rejected`, or `correction_required`. Rejection and correction decisions require a non-empty reason; a verified decision may omit it. Items may transition from `pending`, `in_review`, `verification_requested`, `correction_required`, or `rejected`, but redundant decisions and transitions from terminal `verified` or `not_applicable` states return `VERIFICATION_INVALID_STATE` with HTTP 409.
+
+The trusted review function locks the exact item and rechecks platform-admin status in PostgreSQL. The item update, reviewer attribution, immutable `verification_item_history` append, and `audit_logs` append occur in one transaction. History uses `approved`, `rejected`, or `correction_requested`; audit uses `approve`, `reject`, or `request_correction`. No EIN or encrypted payload is written to either record. Normal authenticated users have no execute privilege on any admin-queue function, and normal tenant RLS remains unchanged.
+
+
 ## Password reset flow
 
 1. Backend requests a Supabase recovery email.
