@@ -97,6 +97,7 @@ Examples:
 - verification:review
 - document:read
 - document:upload
+- ein:reveal (platform admin only)
 - promotion:create
 - promotion:publish
 - audit:read
@@ -104,6 +105,91 @@ Examples:
 Authorization failures return HTTP 403.
 
 Authentication failures return HTTP 401.
+
+
+## Organization onboarding and access
+
+Authenticated users create an organization through:
+
+    POST /api/v1/organizations
+
+The request supplies only the organization name and organization type. A trusted PostgreSQL function derives the owner from `auth.uid()` and creates both the organization and its active owner membership in one transaction. The owner-membership invariant is therefore atomic: the API never accepts a successfully created organization without its initial owner membership.
+
+Organization reads and updates use the protected pipeline:
+
+    requireAuthentication
+      -> loadApplicationIdentity
+      -> validate organization scope
+      -> requirePermission
+      -> user-scoped RLS-backed service
+
+List responses are projected from the user's active resolved memberships. Detail and update operations validate the organization UUID and evaluate permissions for that exact organization. Permissions in one organization do not authorize access to another organization.
+
+After onboarding completes, a subsequent `GET /api/v1/auth/me` resolves the new owner membership from database truth. Request identity is not mutated to simulate onboarding success.
+
+
+## EIN intake and verification
+
+Organization owners and administrators submit EIN intake through:
+
+    PUT /api/v1/organizations/:organizationId/businesses/:businessId/ein
+
+The API validates and normalizes the nine-digit EIN, encrypts it in Node with AES-256-GCM and a fresh cryptographically random IV, and atomically stores the ciphertext, IV, authentication tag, and key version in the protected `business_ein_secrets` table. `businesses.ein_last_four` remains normal display data. Plaintext EINs and encryption keys are never persisted, logged, included in history/audit metadata, or returned by normal APIs.
+
+Encrypted intake uses a narrowly scoped service-role-only transaction that independently verifies the actor is an active owner/admin of the exact organization and that the business belongs to it. It upserts the encrypted secret, updates the last four, finds or creates the latest active verification case, resets or creates the `ein` item with API verification method, appends history, and writes an audit event without plaintext or encrypted payload metadata. The retired last-four-only intake function is no longer executable by authenticated clients.
+
+Platform administrators may explicitly reveal an EIN through:
+
+    POST /api/v1/businesses/:businessId/ein/reveal
+
+The `ein:reveal` permission is granted only by the platform `admin` role—not organization owner/admin/reviewer/member roles or the `sales_rep` account type. A service-role-only database function independently rechecks that platform role, returns only the encrypted payload to Node, and records the access in the same transaction. Node decrypts and returns `{ "businessId": "...", "ein": "12-3456789" }`; ciphertext, IV, authentication tag, key version, and key are never exposed. Every successful secret retrieval for reveal is audited without the EIN. Platform-admin-only reveal is the conservative baseline and may be adjusted only after stakeholder confirmation.
+
+Provider verification is deliberately admin-triggered through:
+
+    POST /api/v1/verification-items/:verificationItemId/ein/verify
+
+It is never started automatically by case submission. Organization owner/admin/reviewer roles with `verification:review`, or a platform administrator with `admin:verification_review`, may request it. Trusted database functions re-check authorization against the item's owning organization; platform-admin access is limited to this explicit verification path and does not weaken tenant RLS.
+
+Provider-specific behavior is isolated behind an `EinVerificationProvider` adapter. The verification endpoint accepts no EIN body. A trusted backend function rechecks the requesting actor against the exact item and organization, returns the encrypted payload to Node, and Node decrypts it only for the provider call. If no approved adapter and credentials are configured, the API fails closed with `EIN_VERIFICATION_NOT_CONFIGURED` and writes no fake verification state. Once an adapter is registered, request and completion transactions persist the attempt, update the item lifecycle, append verification history, and add audit events. Raw provider responses are not retained by the MVP implementation.
+
+API verification may begin from `pending` or `in_review`, and may restart after `rejected` or `correction_required`. It cannot overwrite `verified`, `not_applicable`, or an existing `verification_requested` state.
+
+The request transaction remains user-scoped and rechecks tenant reviewer/platform-admin authorization. Provider completion is a distinct backend-only operation: `complete_ein_verification` is executable only by PostgreSQL `service_role`, and the Node service-role client is used only for encrypted EIN persistence, authorized encrypted-secret retrieval, and provider completion. Completion derives history/audit actor attribution from the locked attempt's `requested_by_user_id`; it accepts no caller-supplied actor identity. Normal identity, organization, membership, and request-authorization operations remain Bearer-token/RLS scoped.
+
+`EIN_ENCRYPTION_KEY` is a server-only base64-encoded 32-byte key, and `EIN_ENCRYPTION_KEY_VERSION` identifies the active version. Sensitive EIN operations fail closed when the configured key is unavailable or invalid. Each encrypted row stores its key version; the Node key resolver is deliberately version-aware so a future key map or AWS KMS integration can support rotation without changing the database model.
+
+
+## Admin verification queue
+
+The global verification queue is available only to authenticated users whose application identity contains platform role `admin`. Organization owner/admin/reviewer memberships do not grant global access. The routes are:
+
+    GET /api/v1/admin/verification-queue
+    GET /api/v1/admin/verification-cases/:verificationCaseId
+    POST /api/v1/admin/verification-items/:verificationItemId/review
+
+The queue supports optional `status`, `itemType`, `organizationId`, and `limit` filters, with a maximum limit of 100. Without an explicit status filter it includes `pending`, `in_review`, `verification_requested`, and `correction_required`. `verified` and `not_applicable` appear only when explicitly requested for historical inspection. `rejected` is omitted from the default queue but remains available through an explicit status filter and case detail, and may be re-reviewed into a different supported decision.
+
+Queue and case-detail reads use service-role-only database functions that independently verify the supplied actor exists and has platform role `admin`. These functions project only review-safe fields instead of granting broad table access. Queue responses contain case, item, organization, business, status, method, and review timestamps. Detail responses add safe document metadata, immutable item history, EIN last four, cannabis-license lookup summaries, and provider-attempt summaries. They exclude full EINs, encrypted EIN fields, storage locations, raw provider responses, and secrets. Full EIN access remains a separate, explicit, audited `POST /api/v1/businesses/:businessId/ein/reveal` action guarded by `ein:reveal`.
+
+Review requests accept only `verified`, `rejected`, or `correction_required`. Rejection and correction decisions require a non-empty reason; a verified decision may omit it. Items may transition from `pending`, `in_review`, `verification_requested`, `correction_required`, or `rejected`, but redundant decisions and transitions from terminal `verified` or `not_applicable` states return `VERIFICATION_INVALID_STATE` with HTTP 409.
+
+The trusted review function locks the exact item and rechecks platform-admin status in PostgreSQL. The item update, reviewer attribution, immutable `verification_item_history` append, and `audit_logs` append occur in one transaction. History uses `approved`, `rejected`, or `correction_requested`; audit uses `approve`, `reject`, or `request_correction`. No EIN or encrypted payload is written to either record. Normal authenticated users have no execute privilege on any admin-queue function, and normal tenant RLS remains unchanged.
+
+
+## Password reset flow
+
+1. Backend requests a Supabase recovery email.
+2. User opens the recovery link.
+3. Frontend callback establishes the Supabase recovery session.
+4. Frontend sends the recovery session access token and refresh token to:
+
+   POST /api/v1/auth/reset-password
+
+5. Node validates the authenticated identity and updates the password.
+
+The frontend callback is required to establish the Supabase recovery session.
+The backend does not implement a custom password-reset token format.
+
 
 ## Storage contract
 
