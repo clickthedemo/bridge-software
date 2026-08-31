@@ -5,5 +5,10 @@
     "packageManager": "pnpm@10.34.5",
     "engines": {
         "node": ">=24.11.0 <25"
+    },
+    "scripts": {
+        "dev:admin": "pnpm --filter @thebridge/admin dev",
+        "build:admin": "pnpm --filter @thebridge/admin build",
+        "typecheck:admin": "pnpm --filter @thebridge/admin typecheck"
     }
 }
