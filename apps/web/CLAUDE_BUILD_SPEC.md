@@ -6,7 +6,7 @@ This document converts the four status screenshots into an executable build plan
 
 ## 1. Confirm the project before doing anything
 
-- Repository: `dillonmohr8777/bridge-software-frontend`
+- Repository: `getonthebridge0-max/thebridge`
 - Branch: create feature branches from `development`; promote reviewed work to `production`
 - Product: Tori's cannabis-industry directory and professional network
 - Front end: Next.js App Router, React, strict TypeScript, semantic CSS tokens

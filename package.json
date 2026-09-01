@@ -7,8 +7,11 @@
         "node": ">=24.11.0 <25"
     },
     "scripts": {
-        "dev:admin": "pnpm --filter @thebridge/admin dev",
-        "build:admin": "pnpm --filter @thebridge/admin build",
-        "typecheck:admin": "pnpm --filter @thebridge/admin typecheck"
+        "dev:web": "pnpm --dir apps/web dev",
+        "dev:api": "pnpm --dir apps/api dev",
+        "build:web": "pnpm --dir apps/web build",
+        "build:api": "pnpm --dir apps/api build",
+        "typecheck:web": "pnpm --dir apps/web typecheck",
+        "typecheck:api": "pnpm --dir apps/api typecheck"
     }
 }

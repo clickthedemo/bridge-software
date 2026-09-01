@@ -1,10 +1,10 @@
 # Copy-paste prompt for an integration coding session
 
-Paste everything below into a new coding session after attaching the private GitHub repository `dillonmohr8777/bridge-software-frontend`.
+Paste everything below into a new coding session after attaching the private GitHub repository `getonthebridge0-max/thebridge`.
 
 ---
 
-Use only the private GitHub repository `dillonmohr8777/bridge-software-frontend` for this task.
+Use only the private GitHub repository `getonthebridge0-max/thebridge` for this task.
 
 This is the Bridge software-development project for Tori: a cannabis-industry directory and professional-network web application. It is not Bridge of Hope OTC, an SEO engagement, or a generic client-meeting-prep task.
 

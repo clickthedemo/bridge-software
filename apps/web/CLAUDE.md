@@ -6,7 +6,7 @@ It is **not** Bridge of Hope OTC, an SEO client, a marketing audit, or a generic
 
 The correct repository is:
 
-- GitHub: `dillonmohr8777/bridge-software-frontend`
+- GitHub: `getonthebridge0-max/thebridge`
 - Default branch: `production`; integration work starts from `development`
 - Application stack: Next.js + React + TypeScript
 - Primary work: Greencubes API integration into the approved Bridge frontend, preview QA, and controlled production promotion

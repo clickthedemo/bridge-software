@@ -5,6 +5,7 @@ import { AgeGate } from "@/components/AgeGate";
 import { SiteHeader } from "@/components/SiteHeader";
 import { DEFAULT_THEME, lockedTheme } from "@/lib/direction-lock";
 import { AGE_GATE_CONFIRMED_VALUE, AGE_GATE_STORAGE_KEY } from "@/lib/age-gate";
+import { AuthProvider } from "@/components/auth/AuthProvider";
 
 const bridgeDisplay = Poppins({
   subsets: ["latin"],
@@ -33,7 +34,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <script dangerouslySetInnerHTML={{ __html: ageGateScript }} />
       </head>
       <body className={bridgeDisplay.variable}>
-        <AgeGate>
+        <AuthProvider><AgeGate>
           <a className="skip-link" href="#main">Skip to content</a>
           <SiteHeader />
           <main id="main">{children}</main>
@@ -43,7 +44,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
               <span>Provisional identity · pending Tori approval</span>
             </div>
           </footer>
-        </AgeGate>
+        </AgeGate></AuthProvider>
       </body>
     </html>
   );

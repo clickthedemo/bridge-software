@@ -1,8 +1,9 @@
 import Image from "next/image";
 import { MyProfileClient } from "./my-profile-client";
+import { RequireAuth } from "@/components/auth/RequireAuth";
 export default function MyProfilePage() {
   return (
-    <div className="page shell">
+    <RequireAuth><div className="page shell">
       <div className="page-heading page-heading-with-media">
         <div>
           <p className="eyebrow">My Profile · Verified Cannabis Business</p>
@@ -12,6 +13,6 @@ export default function MyProfilePage() {
         <div className="grain-image page-heading-media"><Image alt="Business team reviewing public and protected profile details" fill priority sizes="(max-width: 900px) 100vw, 38vw" src="/bridge-editorial/profile-protected-details.webp" /></div>
       </div>
       <MyProfileClient />
-    </div>
+    </div></RequireAuth>
   );
 }
