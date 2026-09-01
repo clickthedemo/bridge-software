@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 112" role="img" aria-labelledby="title">
+  <title id="title">Bridge arch mark</title>
+  <defs>
+    <linearGradient id="bridge-purple" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7c3aed"/>
+      <stop offset="1" stop-color="#4b0082"/>
+    </linearGradient>
+  </defs>
+  <path d="M18 104V72C18 31.7 50.2 8 90 8s72 23.7 72 64v32" fill="none" stroke="url(#bridge-purple)" stroke-width="16"/>
+  <path d="M50 104V73c0-22.8 17.6-35 40-35s40 12.2 40 35v31" fill="none" stroke="url(#bridge-purple)" stroke-width="16"/>
+  <path d="M82 104V74c0-5.3 3.5-8 8-8s8 2.7 8 8v30" fill="none" stroke="url(#bridge-purple)" stroke-width="16"/>
+</svg>

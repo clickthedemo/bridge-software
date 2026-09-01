@@ -1,0 +1,882 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-31T20:29:15.724Z",
+  "businessRoute": "bridge-software",
+  "visualContract": "Bridge editorial documentary realism: tactile detail, asymmetric framing, directional light, crisp professional color grade, and a separate web grain treatment. Built around Bridge's verified Connected identity with deep aubergine, near-black, restrained violet practical light, subtle coral structure, and warm neutral highlights. No text, logos, watermarks, visible consumption, smoke, glossy rendering, or stock-photo posing.",
+  "intentionalReuseExceptions": [
+    "/bridge-mark.svg",
+    "/textures/bridge-film-grain.webp"
+  ],
+  "sheets": [
+    {
+      "id": "sheet-01",
+      "prompt": "Oregon edible wholesale presentation; Michigan retail shelf planning; California cultivation and genetics inspection; Maryland professional education event.",
+      "assets": [
+        "community-oregon-edibles.webp",
+        "community-michigan-retail.webp",
+        "community-california-cultivation.webp",
+        "community-maryland-education.webp"
+      ]
+    },
+    {
+      "id": "sheet-02",
+      "prompt": "New Jersey wellness wholesale review; Michigan licensed transport planning; Ohio facility climate-control service; Michigan analytical sample intake.",
+      "assets": [
+        "community-new-jersey-wellness.webp",
+        "community-michigan-logistics.webp",
+        "community-ohio-facility.webp",
+        "community-michigan-testing.webp"
+      ]
+    },
+    {
+      "id": "sheet-03",
+      "prompt": "Flower and genetics detail; pre-roll and vapor hardware assortment; edible and wellness textures; testing and compliance laboratory.",
+      "assets": [
+        "category-flower-genetics.webp",
+        "category-prerolls-vapes.webp",
+        "category-edibles-wellness.webp",
+        "category-testing-compliance.webp"
+      ]
+    },
+    {
+      "id": "sheet-04",
+      "prompt": "Cannabis industry services coordination; Cascade Canna edible production; Harbor Dispensary buyer handoff; Northstar territory planning.",
+      "assets": [
+        "category-industry-services.webp",
+        "profile-cascade-canna.webp",
+        "profile-harbor-dispensary.webp",
+        "profile-northstar-sales.webp"
+      ]
+    },
+    {
+      "id": "sheet-05",
+      "prompt": "Mosaic Market merchandising; Greenline Goods wellness studio; Presque Isle patient education; Steel City concentrate production.",
+      "assets": [
+        "profile-mosaic-market.webp",
+        "profile-greenline-goods.webp",
+        "profile-presque-isle-wellness.webp",
+        "profile-steel-city-botanicals.webp"
+      ]
+    },
+    {
+      "id": "sheet-06",
+      "prompt": "Front Range territory planning; Motor City buying team; Union Street local supply partnership; Golden State genetics selection.",
+      "assets": [
+        "profile-front-range-reps.webp",
+        "profile-motor-city-supply.webp",
+        "profile-union-street.webp",
+        "profile-golden-state-genetics.webp"
+      ]
+    },
+    {
+      "id": "sheet-07",
+      "prompt": "Great Lakes analytical laboratory; Purple Route licensed transport; Canopy Capital treasury advisory; Root Zone hydroponics calibration.",
+      "assets": [
+        "profile-great-lakes-analytics.webp",
+        "profile-purple-route-logistics.webp",
+        "profile-canopy-capital-services.webp",
+        "profile-root-zone-hydro.webp"
+      ]
+    },
+    {
+      "id": "sheet-08",
+      "prompt": "Evergreen facility systems; Lake Effect compliant manufacturing; Signal Desk operator interview; professional nationwide industry gathering.",
+      "assets": [
+        "profile-evergreen-facility-group.webp",
+        "profile-lake-effect-manufacturing.webp",
+        "profile-signal-desk-media.webp",
+        "home-community-network.webp"
+      ]
+    },
+    {
+      "id": "sheet-09",
+      "prompt": "Nationwide market discovery; verified business introduction; promotion creator workflow; public-versus-protected profile review.",
+      "assets": [
+        "home-nationwide-markets.webp",
+        "home-verified-identity.webp",
+        "create-promotion-studio.webp",
+        "profile-protected-details.webp"
+      ]
+    },
+    {
+      "id": "sheet-10",
+      "prompt": "Community category thumbnails for edibles, retail, cultivation, and professional education events.",
+      "assets": [
+        "community-category-edibles.webp",
+        "community-category-retail.webp",
+        "community-category-cultivation.webp",
+        "community-category-events.webp"
+      ]
+    },
+    {
+      "id": "sheet-11",
+      "prompt": "Community category thumbnails for wellness, secure transport, facility services, and analytical testing.",
+      "assets": [
+        "community-category-wellness.webp",
+        "community-category-transport.webp",
+        "community-category-services.webp",
+        "community-category-testing.webp"
+      ]
+    },
+    {
+      "id": "sheet-12",
+      "prompt": "Arizona retail buying session; Illinois territory planning; Massachusetts local operator meetup; Pennsylvania customer education session. Strong Bridge-purple documentary photography with visible 35mm grain and print texture.",
+      "assets": [
+        "community-arizona-retail-planning.webp",
+        "community-illinois-route-planning.webp",
+        "community-massachusetts-meetup.webp",
+        "community-pennsylvania-education.webp"
+      ]
+    },
+    {
+      "id": "sheet-13",
+      "prompt": "Colorado craft-brand office hours; Colorado business readiness clinic; Pennsylvania compliant packaging review; Michigan production planning. Strong Bridge-purple documentary photography with visible 35mm grain and print texture.",
+      "assets": [
+        "community-colorado-office-hours.webp",
+        "community-colorado-finance-clinic.webp",
+        "community-pennsylvania-packaging.webp",
+        "community-michigan-production.webp"
+      ]
+    },
+    {
+      "id": "sheet-14",
+      "prompt": "New York operator interview; California cultivation field notes; California water-efficiency workshop; Oregon retailer sample-kit production. Strong Bridge-purple documentary photography with visible 35mm grain and print texture.",
+      "assets": [
+        "community-new-york-interview.webp",
+        "community-california-field-notes.webp",
+        "community-california-water-workshop.webp",
+        "community-oregon-sample-kit.webp"
+      ]
+    }
+  ],
+  "assets": [
+    {
+      "file": "category-edibles-wellness.webp",
+      "publicPath": "/bridge-editorial/category-edibles-wellness.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/explore",
+      "slot": "category-edibles-wellness",
+      "promptId": "sheet-03",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1536x1024 contact sheet",
+      "dimensions": "760x504",
+      "format": "WebP",
+      "sha256": "7bcf70e24ecae262b280435fac9b6d2f60d1d979eacdd0ce7b87bcc32d04756b"
+    },
+    {
+      "file": "category-flower-genetics.webp",
+      "publicPath": "/bridge-editorial/category-flower-genetics.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/explore",
+      "slot": "category-flower-genetics",
+      "promptId": "sheet-03",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1536x1024 contact sheet",
+      "dimensions": "760x504",
+      "format": "WebP",
+      "sha256": "92f02e1407a4c1a6cfc4c08b04ec73cbb4e38ccb9c079fc076d98386a0dd3a21"
+    },
+    {
+      "file": "category-industry-services.webp",
+      "publicPath": "/bridge-editorial/category-industry-services.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/explore",
+      "slot": "category-industry-services",
+      "promptId": "sheet-04",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1536x1024 contact sheet",
+      "dimensions": "760x504",
+      "format": "WebP",
+      "sha256": "61e49162fb9baf76464f0bc5710076159ada899ad4bc877c0cc2fe8b362ab220"
+    },
+    {
+      "file": "category-prerolls-vapes.webp",
+      "publicPath": "/bridge-editorial/category-prerolls-vapes.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/explore",
+      "slot": "category-prerolls-vapes",
+      "promptId": "sheet-03",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1536x1024 contact sheet",
+      "dimensions": "760x504",
+      "format": "WebP",
+      "sha256": "383127face3887b951d22bfd37134805a683f457494ca8b3bdbd0cc248221b5b"
+    },
+    {
+      "file": "category-testing-compliance.webp",
+      "publicPath": "/bridge-editorial/category-testing-compliance.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/explore",
+      "slot": "category-testing-compliance",
+      "promptId": "sheet-03",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1536x1024 contact sheet",
+      "dimensions": "760x504",
+      "format": "WebP",
+      "sha256": "64799720c515550f66ce43feef90a1c6aa04412a3ddbcc11f67f08387aea64a8"
+    },
+    {
+      "file": "community-arizona-retail-planning.webp",
+      "publicPath": "/bridge-editorial/community-arizona-retail-planning.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/community",
+      "slot": "community-arizona-retail-planning",
+      "promptId": "sheet-12",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1448x1086 contact sheet",
+      "dimensions": "724x543",
+      "format": "WebP",
+      "sha256": "3d9a8d90920677af9ceb3c1c0af5029aad16f0eeecd43747d83155ac7969801f"
+    },
+    {
+      "file": "community-california-cultivation.webp",
+      "publicPath": "/bridge-editorial/community-california-cultivation.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/community",
+      "slot": "community-california-cultivation",
+      "promptId": "sheet-01",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1536x1024 contact sheet",
+      "dimensions": "760x504",
+      "format": "WebP",
+      "sha256": "1646ed0ec4dba869f438351e0a878e45ba905b7e72c1f14a0b4d6079d34e6058"
+    },
+    {
+      "file": "community-california-field-notes.webp",
+      "publicPath": "/bridge-editorial/community-california-field-notes.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/community",
+      "slot": "community-california-field-notes",
+      "promptId": "sheet-14",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1448x1086 contact sheet",
+      "dimensions": "724x543",
+      "format": "WebP",
+      "sha256": "0012c87668c5df51887ba453b10474f44b56ea1ec5b2c313fe9c601c4f57d1a0"
+    },
+    {
+      "file": "community-california-water-workshop.webp",
+      "publicPath": "/bridge-editorial/community-california-water-workshop.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/community",
+      "slot": "community-california-water-workshop",
+      "promptId": "sheet-14",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1448x1086 contact sheet",
+      "dimensions": "724x543",
+      "format": "WebP",
+      "sha256": "7543ba533c507c583c4f7c9bb28497ccba28ec32421b2c4821da0cf8366818e4"
+    },
+    {
+      "file": "community-category-cultivation.webp",
+      "publicPath": "/bridge-editorial/community-category-cultivation.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/community",
+      "slot": "community-category-cultivation",
+      "promptId": "sheet-10",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1536x1024 contact sheet",
+      "dimensions": "760x504",
+      "format": "WebP",
+      "sha256": "d9c9ec85981b96ae328660c1793c5f6a6c41e46744b7e80c990485311857e3b6"
+    },
+    {
+      "file": "community-category-edibles.webp",
+      "publicPath": "/bridge-editorial/community-category-edibles.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/community",
+      "slot": "community-category-edibles",
+      "promptId": "sheet-10",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1536x1024 contact sheet",
+      "dimensions": "760x504",
+      "format": "WebP",
+      "sha256": "cb37f9dbea67ac6f46cff9260c754e9d0f0feb6ebd8c66dace8510ed580348aa"
+    },
+    {
+      "file": "community-category-events.webp",
+      "publicPath": "/bridge-editorial/community-category-events.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/community",
+      "slot": "community-category-events",
+      "promptId": "sheet-10",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1536x1024 contact sheet",
+      "dimensions": "760x504",
+      "format": "WebP",
+      "sha256": "3bda2abd4a752ca21469efd87beb3aee66b172e7f06e938ee7d03a425fcb1747"
+    },
+    {
+      "file": "community-category-retail.webp",
+      "publicPath": "/bridge-editorial/community-category-retail.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/community",
+      "slot": "community-category-retail",
+      "promptId": "sheet-10",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1536x1024 contact sheet",
+      "dimensions": "760x504",
+      "format": "WebP",
+      "sha256": "956b3087cf6a580f04adfdf03dd770c48a918b83b1f01f6b473e79862836d5ac"
+    },
+    {
+      "file": "community-category-services.webp",
+      "publicPath": "/bridge-editorial/community-category-services.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/community",
+      "slot": "community-category-services",
+      "promptId": "sheet-11",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1536x1024 contact sheet",
+      "dimensions": "760x504",
+      "format": "WebP",
+      "sha256": "7f39490046038ae601cc6bc8d18b47bb8e7e35d03340602ab9a0f4868c5aca3d"
+    },
+    {
+      "file": "community-category-testing.webp",
+      "publicPath": "/bridge-editorial/community-category-testing.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/community",
+      "slot": "community-category-testing",
+      "promptId": "sheet-11",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1536x1024 contact sheet",
+      "dimensions": "760x504",
+      "format": "WebP",
+      "sha256": "b0b9b78d678c42a4010b5cc185cd1b961106fe47ce84d849051c5af3fff051c0"
+    },
+    {
+      "file": "community-category-transport.webp",
+      "publicPath": "/bridge-editorial/community-category-transport.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/community",
+      "slot": "community-category-transport",
+      "promptId": "sheet-11",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1536x1024 contact sheet",
+      "dimensions": "760x504",
+      "format": "WebP",
+      "sha256": "203b7e4de649cb1e312d95f3a400a9f180e4bf12b8909df57b835cad42b4967f"
+    },
+    {
+      "file": "community-category-wellness.webp",
+      "publicPath": "/bridge-editorial/community-category-wellness.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/community",
+      "slot": "community-category-wellness",
+      "promptId": "sheet-11",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1536x1024 contact sheet",
+      "dimensions": "760x504",
+      "format": "WebP",
+      "sha256": "74582567955a7c50de64404c74f86cd89c7a61809ad88cfb6ad0d6491a035dbc"
+    },
+    {
+      "file": "community-colorado-finance-clinic.webp",
+      "publicPath": "/bridge-editorial/community-colorado-finance-clinic.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/community",
+      "slot": "community-colorado-finance-clinic",
+      "promptId": "sheet-13",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1448x1086 contact sheet",
+      "dimensions": "724x543",
+      "format": "WebP",
+      "sha256": "1666c3a9f29c0b5b92420d861ad539ef9e0a661b6325eef96fecc6b304e22a43"
+    },
+    {
+      "file": "community-colorado-office-hours.webp",
+      "publicPath": "/bridge-editorial/community-colorado-office-hours.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/community",
+      "slot": "community-colorado-office-hours",
+      "promptId": "sheet-13",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1448x1086 contact sheet",
+      "dimensions": "724x543",
+      "format": "WebP",
+      "sha256": "0aacf5344e67f06f0ccff7b10510106d7cee1cc218cbbec298fed7ccb4003bf4"
+    },
+    {
+      "file": "community-illinois-route-planning.webp",
+      "publicPath": "/bridge-editorial/community-illinois-route-planning.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/community",
+      "slot": "community-illinois-route-planning",
+      "promptId": "sheet-12",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1448x1086 contact sheet",
+      "dimensions": "724x543",
+      "format": "WebP",
+      "sha256": "3e8d01c0247be6029a58eeb29373659408367f7b3b1d13ecd7cb0927dfeeed69"
+    },
+    {
+      "file": "community-maryland-education.webp",
+      "publicPath": "/bridge-editorial/community-maryland-education.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/community",
+      "slot": "community-maryland-education",
+      "promptId": "sheet-01",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1536x1024 contact sheet",
+      "dimensions": "760x504",
+      "format": "WebP",
+      "sha256": "1e2e265dc6a3bcc7daf90cb9f8141a21483bd18300253750092ac0800e95886b"
+    },
+    {
+      "file": "community-massachusetts-meetup.webp",
+      "publicPath": "/bridge-editorial/community-massachusetts-meetup.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/community",
+      "slot": "community-massachusetts-meetup",
+      "promptId": "sheet-12",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1448x1086 contact sheet",
+      "dimensions": "724x543",
+      "format": "WebP",
+      "sha256": "c05859162e15b1b6d64d9857370bcb290e84abaa2e0a2c3112b97c578b579650"
+    },
+    {
+      "file": "community-michigan-logistics.webp",
+      "publicPath": "/bridge-editorial/community-michigan-logistics.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/community",
+      "slot": "community-michigan-logistics",
+      "promptId": "sheet-02",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1536x1024 contact sheet",
+      "dimensions": "760x504",
+      "format": "WebP",
+      "sha256": "2af715152f692b121bc632aa5cb795c503e88f4442ce32c8f02697848495399b"
+    },
+    {
+      "file": "community-michigan-production.webp",
+      "publicPath": "/bridge-editorial/community-michigan-production.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/community",
+      "slot": "community-michigan-production",
+      "promptId": "sheet-13",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1448x1086 contact sheet",
+      "dimensions": "724x543",
+      "format": "WebP",
+      "sha256": "7412b272a00fd8f4364c198cc3f3fc7eb8682096f86602363e35192e27344068"
+    },
+    {
+      "file": "community-michigan-retail.webp",
+      "publicPath": "/bridge-editorial/community-michigan-retail.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/community",
+      "slot": "community-michigan-retail",
+      "promptId": "sheet-01",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1536x1024 contact sheet",
+      "dimensions": "760x504",
+      "format": "WebP",
+      "sha256": "8d08062116efceacb4981bba8234383807c662fb7da0d01a36420090bdaf8fd4"
+    },
+    {
+      "file": "community-michigan-testing.webp",
+      "publicPath": "/bridge-editorial/community-michigan-testing.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/community",
+      "slot": "community-michigan-testing",
+      "promptId": "sheet-02",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1536x1024 contact sheet",
+      "dimensions": "760x504",
+      "format": "WebP",
+      "sha256": "3c6c364f04c2d54b2ca9821230d8af1df9ae27816a477eb7eceb0f150f788538"
+    },
+    {
+      "file": "community-new-jersey-wellness.webp",
+      "publicPath": "/bridge-editorial/community-new-jersey-wellness.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/community",
+      "slot": "community-new-jersey-wellness",
+      "promptId": "sheet-02",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1536x1024 contact sheet",
+      "dimensions": "760x504",
+      "format": "WebP",
+      "sha256": "fc8a06b70b306b431eb51a877fea77101996d16bfca822d8d41ce58185a3925f"
+    },
+    {
+      "file": "community-new-york-interview.webp",
+      "publicPath": "/bridge-editorial/community-new-york-interview.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/community",
+      "slot": "community-new-york-interview",
+      "promptId": "sheet-14",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1448x1086 contact sheet",
+      "dimensions": "724x543",
+      "format": "WebP",
+      "sha256": "397d75c3ede11f561cb8b6976656ca36ab92a73770c00f7691947fe4b49c4aee"
+    },
+    {
+      "file": "community-ohio-facility.webp",
+      "publicPath": "/bridge-editorial/community-ohio-facility.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/community",
+      "slot": "community-ohio-facility",
+      "promptId": "sheet-02",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1536x1024 contact sheet",
+      "dimensions": "760x504",
+      "format": "WebP",
+      "sha256": "31aed5ebbf83cab0f7125795986710e317209ca9de8ac5f6f5ea0c1527789bde"
+    },
+    {
+      "file": "community-oregon-edibles.webp",
+      "publicPath": "/bridge-editorial/community-oregon-edibles.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/community",
+      "slot": "community-oregon-edibles",
+      "promptId": "sheet-01",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1536x1024 contact sheet",
+      "dimensions": "760x504",
+      "format": "WebP",
+      "sha256": "08d6591bfb6847676227b794a032b63107c90e995b31e33167912786267cf208"
+    },
+    {
+      "file": "community-oregon-sample-kit.webp",
+      "publicPath": "/bridge-editorial/community-oregon-sample-kit.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/community",
+      "slot": "community-oregon-sample-kit",
+      "promptId": "sheet-14",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1448x1086 contact sheet",
+      "dimensions": "724x543",
+      "format": "WebP",
+      "sha256": "3899c58e56bc7154057a9f1be167355c739f7dc5c51cd73140a715f2183b58a9"
+    },
+    {
+      "file": "community-pennsylvania-education.webp",
+      "publicPath": "/bridge-editorial/community-pennsylvania-education.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/community",
+      "slot": "community-pennsylvania-education",
+      "promptId": "sheet-12",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1448x1086 contact sheet",
+      "dimensions": "724x543",
+      "format": "WebP",
+      "sha256": "cb4fde10d524c28979b6f4a45a992520639811c37190f0913fb5d2f66880b9b6"
+    },
+    {
+      "file": "community-pennsylvania-packaging.webp",
+      "publicPath": "/bridge-editorial/community-pennsylvania-packaging.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/community",
+      "slot": "community-pennsylvania-packaging",
+      "promptId": "sheet-13",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1448x1086 contact sheet",
+      "dimensions": "724x543",
+      "format": "WebP",
+      "sha256": "77ac3a2a3879ef58c2437a79a6d101909731598c5c3cc35195e2e03f5f923106"
+    },
+    {
+      "file": "create-promotion-studio.webp",
+      "publicPath": "/bridge-editorial/create-promotion-studio.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/create",
+      "slot": "create-promotion-studio",
+      "promptId": "sheet-09",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1536x1024 contact sheet",
+      "dimensions": "760x504",
+      "format": "WebP",
+      "sha256": "cfa8f3b989fd603ccc9516d9313569e907fa01a517c047503c637438e806d1f9"
+    },
+    {
+      "file": "home-community-network.webp",
+      "publicPath": "/bridge-editorial/home-community-network.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/",
+      "slot": "home-community-network",
+      "promptId": "sheet-08",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1536x1024 contact sheet",
+      "dimensions": "760x504",
+      "format": "WebP",
+      "sha256": "454a21c8157bb550416e608245434ea9de767f96af818cccf77355b711ecd716"
+    },
+    {
+      "file": "home-nationwide-markets.webp",
+      "publicPath": "/bridge-editorial/home-nationwide-markets.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/",
+      "slot": "home-nationwide-markets",
+      "promptId": "sheet-09",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1536x1024 contact sheet",
+      "dimensions": "760x504",
+      "format": "WebP",
+      "sha256": "b1d79e99672f37525e3792288a48db5a3dd75e944bea74cd70c8f3007b999d14"
+    },
+    {
+      "file": "home-verified-identity.webp",
+      "publicPath": "/bridge-editorial/home-verified-identity.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/",
+      "slot": "home-verified-identity",
+      "promptId": "sheet-09",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1536x1024 contact sheet",
+      "dimensions": "760x504",
+      "format": "WebP",
+      "sha256": "b4cfe88a8838316a6ea41f02b73cb34e6a9ac832c929463a5086c6ccbd9155b8"
+    },
+    {
+      "file": "profile-canopy-capital-services.webp",
+      "publicPath": "/bridge-editorial/profile-canopy-capital-services.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/explore and /profile/[slug]",
+      "slot": "profile-canopy-capital-services",
+      "promptId": "sheet-07",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1536x1024 contact sheet",
+      "dimensions": "760x504",
+      "format": "WebP",
+      "sha256": "2010e2ce822602dc831cfb52e3565826251275428b50c2897235432ce248a8f4"
+    },
+    {
+      "file": "profile-cascade-canna.webp",
+      "publicPath": "/bridge-editorial/profile-cascade-canna.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/explore and /profile/[slug]",
+      "slot": "profile-cascade-canna",
+      "promptId": "sheet-04",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1536x1024 contact sheet",
+      "dimensions": "760x504",
+      "format": "WebP",
+      "sha256": "53c8d8ed3c49abda7caa2ba0fcd62b7a38e4c5503dd3d6047500f3755134446b"
+    },
+    {
+      "file": "profile-evergreen-facility-group.webp",
+      "publicPath": "/bridge-editorial/profile-evergreen-facility-group.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/explore and /profile/[slug]",
+      "slot": "profile-evergreen-facility-group",
+      "promptId": "sheet-08",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1536x1024 contact sheet",
+      "dimensions": "760x504",
+      "format": "WebP",
+      "sha256": "2aed3cfff4517fa5e1b450905763650c1a382458c339747168d691944efc7bb4"
+    },
+    {
+      "file": "profile-front-range-reps.webp",
+      "publicPath": "/bridge-editorial/profile-front-range-reps.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/explore and /profile/[slug]",
+      "slot": "profile-front-range-reps",
+      "promptId": "sheet-06",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1536x1024 contact sheet",
+      "dimensions": "760x504",
+      "format": "WebP",
+      "sha256": "c1b9faa3a8b12f0e085749ed733268c987495c0d3dba99aa1683f96e4c94349e"
+    },
+    {
+      "file": "profile-golden-state-genetics.webp",
+      "publicPath": "/bridge-editorial/profile-golden-state-genetics.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/explore and /profile/[slug]",
+      "slot": "profile-golden-state-genetics",
+      "promptId": "sheet-06",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1536x1024 contact sheet",
+      "dimensions": "760x504",
+      "format": "WebP",
+      "sha256": "5f5e86ac1580eb626b4d94a49214d52b201e6a270f1b69d9546d97f9a6757d79"
+    },
+    {
+      "file": "profile-great-lakes-analytics.webp",
+      "publicPath": "/bridge-editorial/profile-great-lakes-analytics.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/explore and /profile/[slug]",
+      "slot": "profile-great-lakes-analytics",
+      "promptId": "sheet-07",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1536x1024 contact sheet",
+      "dimensions": "760x504",
+      "format": "WebP",
+      "sha256": "776b7524895dab1c21d4de4ccd6496d97869cec11558e97519bd683626a8fcca"
+    },
+    {
+      "file": "profile-greenline-goods.webp",
+      "publicPath": "/bridge-editorial/profile-greenline-goods.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/explore and /profile/[slug]",
+      "slot": "profile-greenline-goods",
+      "promptId": "sheet-05",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1536x1024 contact sheet",
+      "dimensions": "760x504",
+      "format": "WebP",
+      "sha256": "f6979affe2d5f6f5473626ef172229afbdd86e0d87baddbc6137d42ff8af3c16"
+    },
+    {
+      "file": "profile-harbor-dispensary.webp",
+      "publicPath": "/bridge-editorial/profile-harbor-dispensary.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/explore and /profile/[slug]",
+      "slot": "profile-harbor-dispensary",
+      "promptId": "sheet-04",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1536x1024 contact sheet",
+      "dimensions": "760x504",
+      "format": "WebP",
+      "sha256": "e816eef743a4a4724e64191f81b951dad08713f7cf5c5d34b5671a9d40903411"
+    },
+    {
+      "file": "profile-lake-effect-manufacturing.webp",
+      "publicPath": "/bridge-editorial/profile-lake-effect-manufacturing.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/explore and /profile/[slug]",
+      "slot": "profile-lake-effect-manufacturing",
+      "promptId": "sheet-08",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1536x1024 contact sheet",
+      "dimensions": "760x504",
+      "format": "WebP",
+      "sha256": "93f2cdfd458ecfc28d255ff3fcb0f254128ae1f15dbc65a22e88316281ea161d"
+    },
+    {
+      "file": "profile-mosaic-market.webp",
+      "publicPath": "/bridge-editorial/profile-mosaic-market.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/explore and /profile/[slug]",
+      "slot": "profile-mosaic-market",
+      "promptId": "sheet-05",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1536x1024 contact sheet",
+      "dimensions": "760x504",
+      "format": "WebP",
+      "sha256": "d0b0a3a3b460ecdf11a2c46ad728d09d57cb11e53787fcd36069ae4618f70a51"
+    },
+    {
+      "file": "profile-motor-city-supply.webp",
+      "publicPath": "/bridge-editorial/profile-motor-city-supply.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/explore and /profile/[slug]",
+      "slot": "profile-motor-city-supply",
+      "promptId": "sheet-06",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1536x1024 contact sheet",
+      "dimensions": "760x504",
+      "format": "WebP",
+      "sha256": "3e305364b35d386d272c02fef45bd083ee63339e0cf8686162a7b19677ae9e46"
+    },
+    {
+      "file": "profile-northstar-sales.webp",
+      "publicPath": "/bridge-editorial/profile-northstar-sales.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/explore and /profile/[slug]",
+      "slot": "profile-northstar-sales",
+      "promptId": "sheet-04",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1536x1024 contact sheet",
+      "dimensions": "760x504",
+      "format": "WebP",
+      "sha256": "a560348c12b687d6ccd3fc00c6637e7b0008dd7c8e0e4ece092c0ec3d8218bae"
+    },
+    {
+      "file": "profile-presque-isle-wellness.webp",
+      "publicPath": "/bridge-editorial/profile-presque-isle-wellness.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/explore and /profile/[slug]",
+      "slot": "profile-presque-isle-wellness",
+      "promptId": "sheet-05",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1536x1024 contact sheet",
+      "dimensions": "760x504",
+      "format": "WebP",
+      "sha256": "4ed3eaa411567c296fbe88613cede971426d70795989b018d52482c57f8fb0c1"
+    },
+    {
+      "file": "profile-protected-details.webp",
+      "publicPath": "/bridge-editorial/profile-protected-details.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/my-profile",
+      "slot": "profile-protected-details",
+      "promptId": "sheet-09",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1536x1024 contact sheet",
+      "dimensions": "760x504",
+      "format": "WebP",
+      "sha256": "56827ea774a0be7ec5235a939f4c1c77db28179a3000561e18a97e5b3df7283e"
+    },
+    {
+      "file": "profile-purple-route-logistics.webp",
+      "publicPath": "/bridge-editorial/profile-purple-route-logistics.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/explore and /profile/[slug]",
+      "slot": "profile-purple-route-logistics",
+      "promptId": "sheet-07",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1536x1024 contact sheet",
+      "dimensions": "760x504",
+      "format": "WebP",
+      "sha256": "c37028581a52d0b17ed0d9b30f13a61fa7e6dab9be082a1c47643eaab870c7df"
+    },
+    {
+      "file": "profile-root-zone-hydro.webp",
+      "publicPath": "/bridge-editorial/profile-root-zone-hydro.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/explore and /profile/[slug]",
+      "slot": "profile-root-zone-hydro",
+      "promptId": "sheet-07",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1536x1024 contact sheet",
+      "dimensions": "760x504",
+      "format": "WebP",
+      "sha256": "42a6cfb5e1f2f6094c89503e05585ffe69bb6f9ad182e5c0eeda352be96cb200"
+    },
+    {
+      "file": "profile-signal-desk-media.webp",
+      "publicPath": "/bridge-editorial/profile-signal-desk-media.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/explore and /profile/[slug]",
+      "slot": "profile-signal-desk-media",
+      "promptId": "sheet-08",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1536x1024 contact sheet",
+      "dimensions": "760x504",
+      "format": "WebP",
+      "sha256": "85ec7f5bede6937196ad2f5eb668727fca18e82907917de4b3860108f75766d9"
+    },
+    {
+      "file": "profile-steel-city-botanicals.webp",
+      "publicPath": "/bridge-editorial/profile-steel-city-botanicals.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/explore and /profile/[slug]",
+      "slot": "profile-steel-city-botanicals",
+      "promptId": "sheet-05",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1536x1024 contact sheet",
+      "dimensions": "760x504",
+      "format": "WebP",
+      "sha256": "60d014a03c35f29830df2bd32b9660bd53e86b3189fe662c8924f9e1896766bd"
+    },
+    {
+      "file": "profile-union-street.webp",
+      "publicPath": "/bridge-editorial/profile-union-street.webp",
+      "businessRoute": "bridge-software",
+      "appRoute": "/explore and /profile/[slug]",
+      "slot": "profile-union-street",
+      "promptId": "sheet-06",
+      "model": "OpenAI image_gen tool",
+      "sourceDimensions": "1536x1024 contact sheet",
+      "dimensions": "760x504",
+      "format": "WebP",
+      "sha256": "320d9fb360b8b4ad1087d820b91f6e134c370fb927ebe72debe750f98eba1895"
+    }
+  ]
+}

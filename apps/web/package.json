@@ -1,5 +1,36 @@
 {
-    "name": "@thebridge/web",
-    "version": "0.1.0",
-    "private": true
+  "name": "bridge-software-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "images:provenance": "node scripts/generate-image-provenance.mjs",
+    "test:images": "node scripts/verify-editorial-images.mjs",
+    "build:staging": "node scripts/build-staging.mjs",
+    "build:staging:current": "node scripts/build-staging-one.mjs current",
+    "build:staging:network": "node scripts/build-staging-one.mjs network",
+    "build:staging:botanical": "node scripts/build-staging-one.mjs botanical",
+    "test:staging": "node scripts/verify-staging.mjs",
+    "test:phase3": "node --test --experimental-strip-types lib/phase3/phase3.test.ts lib/direction-lock.test.ts lib/age-gate.test.ts"
+  },
+  "dependencies": {
+    "next": "16.3.1",
+    "react": "19.2.0",
+    "react-dom": "19.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "eslint": "^9.0.0",
+    "eslint-config-next": "16.3.1",
+    "typescript": "^5.9.0"
+  },
+  "overrides": {
+    "postcss": "8.5.26"
+  }
 }
