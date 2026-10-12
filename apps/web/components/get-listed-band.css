@@ -1,0 +1,104 @@
+/*
+ * Get listed band. Explore is otherwise entirely buyer-side, so this surface
+ * deliberately breaks the glass-card rhythm and sits on the brand ground -
+ * that is what makes it read as speaking to the reader rather than listing
+ * something for them.
+ *
+ * Mobile first: the desktop two-column arrangement is the exception, added at
+ * the width where the headline stops needing the full measure.
+ *
+ * Motion here is transition-only, so the global prefers-reduced-motion rule
+ * in app/globals.css already disables it with !important. No second guard.
+ */
+
+.get-listed-band {
+  /* Deep end of the brand ramp, not the bright end. Next to the etched
+     imagery a full-strength --brand band shouts; --brand-strong keeps it in
+     the same tonal family as the rest of the page and is dark in all three
+     themes, so --on-brand copy stays legible everywhere. */
+  background:
+    radial-gradient(circle 300px at 88% 0%, color-mix(in srgb, var(--accent) 26%, transparent), transparent),
+    linear-gradient(152deg, color-mix(in srgb, var(--brand) 26%, var(--brand-strong)), var(--brand-strong) 70%);
+  border: var(--glass-ring);
+  border-radius: var(--radius);
+  box-shadow: var(--glass-shadow);
+  color: var(--on-brand);
+  display: grid;
+  gap: 22px;
+  /* Contains the grain plate below, which paints at a negative z-index. */
+  isolation: isolate;
+  overflow: hidden;
+  padding: clamp(26px, 6vw, 46px);
+  position: relative;
+}
+
+/* The site's film grain, the same plate the editorial imagery uses. Without
+   it the band reads flatter than every surface sitting next to it. */
+.get-listed-band::after {
+  background-image: url("/textures/bridge-film-grain.webp");
+  background-size: 256px 256px;
+  content: "";
+  inset: 0;
+  mix-blend-mode: soft-light;
+  opacity: 0.4;
+  pointer-events: none;
+  position: absolute;
+  z-index: -1;
+}
+
+.get-listed-band h2 {
+  /* Larger than the global h2 floor: on a phone this is the only thing on
+     screen and it has to carry the whole band. */
+  font-size: clamp(2rem, 5.4vw, 3rem);
+  margin: 0;
+}
+
+.get-listed-band .eyebrow {
+  /* --accent alone does not clear contrast against the brand ground, and
+     botanical's sage accent only reaches 4.6:1 even at 62%. Measured at the
+     lit corner, the worst case: 45% holds above 6:1 in all three themes. */
+  color: color-mix(in srgb, var(--accent) 45%, var(--on-brand));
+}
+
+.get-listed-band .get-listed-lede {
+  color: color-mix(in srgb, var(--on-brand) 82%, transparent);
+  font-family: var(--font-subhead);
+  font-size: clamp(1rem, 2.6vw, 1.14rem);
+  font-weight: 600;
+  margin: 0.9rem 0 0;
+  max-width: 54ch;
+}
+
+.get-listed-band .get-listed-cta {
+  background: var(--on-brand);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.34);
+  color: var(--brand-strong);
+  padding-inline: 1.6rem;
+}
+
+.get-listed-band .get-listed-cta:hover {
+  background: color-mix(in srgb, var(--accent) 20%, var(--on-brand));
+}
+
+/* Same review-build pattern as the community feed, recoloured only because
+   --text is a dark ink in the two light themes and this ground is not. */
+.get-listed-band .review-notice {
+  background: color-mix(in srgb, var(--signal) 15%, transparent);
+  color: color-mix(in srgb, var(--on-brand) 82%, transparent);
+  margin: 0;
+}
+
+@media (min-width: 860px) {
+  .get-listed-band {
+    align-items: center;
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .get-listed-band .get-listed-cta {
+    justify-self: end;
+  }
+
+  .get-listed-band .review-notice {
+    grid-column: 1 / -1;
+  }
+}

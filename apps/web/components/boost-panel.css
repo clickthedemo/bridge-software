@@ -1,0 +1,101 @@
+/*
+ * Boost panel. Single column at every width - it has to survive a 250px
+ * Directory sidebar, so there is no breakpoint here to get wrong.
+ */
+
+.bridge-boost {
+  display: grid;
+  gap: 14px;
+}
+
+/* Gap owns the rhythm; the inherited margins would double it. */
+.bridge-boost > * {
+  margin: 0;
+}
+
+/* The global h2 clamp is built for page headings and swamps a sidebar. */
+.bridge-boost-heading {
+  font-size: 1.5rem;
+}
+
+.bridge-boost-options {
+  display: grid;
+  gap: 10px;
+}
+
+/* The global label rule is written for form fields, so the tier body would
+   inherit 800-weight 12px type. */
+.bridge-boost-option {
+  align-items: start;
+  background: color-mix(in srgb, var(--surface) 46%, transparent);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  cursor: pointer;
+  display: flex;
+  font-size: 0.95rem;
+  font-weight: 400;
+  gap: 11px;
+  margin: 0;
+  /* Comfortable to hit with a thumb. */
+  min-height: 44px;
+  padding: 13px 14px;
+  transition: background 0.18s, border-color 0.18s;
+}
+
+.bridge-boost-option:hover {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+}
+
+.bridge-boost-option:has(:checked) {
+  background: color-mix(in srgb, var(--accent) 11%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 58%, transparent);
+}
+
+/* Same escape the filter-panel checkbox makes: the global input rule stretches
+   every control to full width and 44px tall, which is right for a text field
+   and absurd for a radio. */
+.bridge-boost-option input {
+  accent-color: var(--accent);
+  background: none;
+  block-size: 19px;
+  border: 0;
+  flex: none;
+  inline-size: 19px;
+  /* Sits on the first line of the label, not the middle of the block. */
+  margin-block-start: 3px;
+  min-height: auto;
+  padding: 0;
+}
+
+.bridge-boost-option-body {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.bridge-boost-what {
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+/* Quieter than the line above it - the terms are a footnote to the offer, not
+   a second headline. Size and weight carry that on their own; fading --muted
+   any further drops the line under 4.5:1 on the two light directions. */
+.bridge-boost-meta {
+  color: var(--muted);
+  font-family: var(--font-subhead);
+  font-size: 0.71rem;
+  font-weight: 620;
+  letter-spacing: 0.01em;
+}
+
+/* Not a flex row: the separators are text and the marker is inline. */
+.bridge-boost-summary {
+  background: var(--surface-alt);
+  border-radius: 12px;
+  color: var(--text);
+  font-size: 0.82rem;
+  line-height: 1.9;
+  padding: 9px 13px;
+}

@@ -29,13 +29,24 @@ function searchableText(profile: Profile): string {
     profile.serving,
     profile.description,
     ...profile.specialties,
+    ...(profile.products ?? []),
   ]
     .join(" ")
     .toLowerCase();
 }
 
 export function tokenize(query: string): string[] {
-  return query.toLowerCase().split(/[\s,]+/).filter(Boolean);
+  return query.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+}
+
+export function matchesServiceState(profile: Profile, state: string): boolean {
+  if (state === "All states") return true;
+  const name = STATE_NAMES[state.toLowerCase()] ?? state.toLowerCase();
+  const locationState = profile.location.split(",").at(-1)?.trim().toLowerCase();
+  if ((STATE_NAMES[locationState ?? ""] ?? locationState) === name) return true;
+  const serving = profile.serving.toLowerCase();
+  // Broad regional descriptions do not establish coverage in a specific state.
+  return /\bnationwide\b/.test(serving) || (` ${tokenize(serving).join(" ")} `).includes(` ${name} `);
 }
 
 export function matchesQuery(profile: Profile, query: string): boolean {

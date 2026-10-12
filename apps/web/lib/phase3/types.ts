@@ -20,6 +20,8 @@ export type DelegatedPermission =
 
 export type SessionClaims = {
   userId: string;
+  email?: string | null;
+  displayName?: string | null;
   ageEligible: boolean;
   membershipStatus: MembershipStatus;
   organizationId: string | null;
@@ -28,6 +30,50 @@ export type SessionClaims = {
   delegatedPermissions: DelegatedPermission[];
   stateLicenseEligibility: string[];
   adminScope: boolean;
+};
+
+export type OrganizationMembership = {
+  organizationId: string;
+  organizationName: string;
+  organizationType: "brand" | "retailer" | "dispensary" | null;
+  role: "owner" | "admin" | "reviewer" | "member";
+  status: "active" | "invited" | "suspended" | "removed";
+};
+
+export type CurrentUser = {
+  id: string;
+  email: string | null;
+  accountType: "standard" | "sales_rep" | null;
+  platformRoles: "admin"[];
+  profile: { displayName: string | null; phone: string | null } | null;
+};
+
+export type CurrentUserResponse = { user: CurrentUser; memberships: OrganizationMembership[] };
+
+export type OrganizationType = "brand" | "retailer" | "dispensary";
+export type OrganizationInput = { name: string; organizationType: OrganizationType };
+export type OrganizationRecord = {
+  id: string;
+  name: string;
+  organizationType: OrganizationType | null;
+  membership: Pick<OrganizationMembership, "role" | "status">;
+};
+
+export type AdminUser = {
+  id: string;
+  email: string | null;
+  displayName: string | null;
+  emailVerified: boolean;
+  createdAt: string;
+  lastSignInAt: string | null;
+  accountType: string | null;
+  platformRole: string | null;
+  organizationMemberships: { organizationId: string; organizationName: string; role: string }[];
+};
+
+export type AdminUsersResponse = {
+  users: AdminUser[];
+  pagination: { page: number; pageSize: number; total: number };
 };
 
 export type UploadIntent = {
@@ -120,6 +166,20 @@ export class Phase3Error extends Error {
 }
 
 export type Phase3Client = {
+  listOrganizations(): Promise<{ organizations: OrganizationRecord[] }>;
+  getOrganization(organizationId: string): Promise<{ organization: OrganizationRecord }>;
+  createOrganization(input: OrganizationInput): Promise<{ organization: OrganizationRecord }>;
+  updateOrganization(organizationId: string, input: Partial<OrganizationInput>): Promise<{ organization: OrganizationRecord }>;
+  register(email: string, password: string, displayName: string): Promise<void>;
+  login(email: string, password: string): Promise<CurrentUserResponse>;
+  logout(): Promise<void>;
+  getCurrentUser(): Promise<CurrentUserResponse>;
+  forgotPassword(email: string): Promise<void>;
+  resendVerification(email: string): Promise<void>;
+  resetPassword(newPassword: string): Promise<void>;
+  establishRecoverySession(accessToken: string, refreshToken: string): Promise<void>;
+  listAdminUsers(page: number, pageSize: number): Promise<AdminUsersResponse>;
+  getVerificationQueue(filters?: { status?: string; itemType?: string; limit?: number }): Promise<unknown>;
   getSession(): Promise<SessionClaims>;
   createUploadIntent(file: File): Promise<UploadIntent>;
   createPost(input: CreatePostInput): Promise<PostRecord>;

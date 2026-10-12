@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-04T19:55:00Z",
+  "businessRoute": "bridge-software",
+  "site": "https://bridge-connected-signal.netlify.app",
+  "purpose": "Open Graph and Slack unfurl card for the official Bridge review prototype.",
+  "scene": {
+    "model": "gpt_image_2",
+    "aspectRatio": "16:9",
+    "quality": "high",
+    "resolution": "2k",
+    "prompt": "A monumental steel arch glowing deep violet at dusk, spanning a dense industrial city. Light paths connect warehouses and storefronts like a living network. Warm sodium lamps and electric purple neon. Cinematic wide still. The arch fills two thirds of the frame and sits right of center. Soft open negative space occupies the upper left on a deep indigo night sky. Saturated deep purple and violet against near-black. Bright soft key with punchy shadows, commercial editorial grade. No text, no letters, no logos, no captions, no UI, no people, no products, no cannabis plants."
+  },
+  "compose": {
+    "output": "/og.png",
+    "dimensions": "1200x630",
+    "mark": "/bridge-mark.svg",
+    "markTreatment": "Verified Tori mark, white stroke only. Spelling, proportions, and geometry preserved. Not redrawn by the model.",
+    "type": "Composed locally after generation. Model rendered no text and no logo."
+  }
+}

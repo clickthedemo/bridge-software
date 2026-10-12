@@ -147,6 +147,13 @@
         "community-california-water-workshop.webp",
         "community-oregon-sample-kit.webp"
       ]
+    },
+    {
+      "id": "sheet-15",
+      "prompt": "Editorial documentary photograph: hands checking a business licence document against a laptop, stamped certificate and paperwork on a desk, no readable text, no faces, no product.",
+      "assets": [
+        "verified-licence-check.webp"
+      ]
     }
   ],
   "assets": [
@@ -877,6 +884,19 @@
       "dimensions": "760x504",
       "format": "WebP",
       "sha256": "320d9fb360b8b4ad1087d820b91f6e134c370fb927ebe72debe750f98eba1895"
+    },
+    {
+      "file": "verified-licence-check.webp",
+      "publicPath": "/bridge-editorial/verified-licence-check.webp",
+      "businessRoute": "verified",
+      "appRoute": "/verified",
+      "slot": "page-heading-media",
+      "promptId": "sheet-15",
+      "model": "Higgsfield nano_banana_pro",
+      "sourceDimensions": "2528x1696",
+      "dimensions": "760x604",
+      "format": "WebP",
+      "sha256": "6423e642b3297187bae641fd89730b732c352117cdc738826a7c389032a6d64f"
     }
   ]
 }

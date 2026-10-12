@@ -1,0 +1,163 @@
+/*
+ * Bridge mascot placement and idle.
+ *
+ * She is decorative and must never block a control, so the whole element is
+ * pointer-events: none and sits at a z-index below the category tiles - that
+ * is what makes her read as standing *behind* them.
+ */
+
+.bridge-mascot {
+  pointer-events: none;
+  position: absolute;
+  z-index: 0;
+}
+
+.bridge-mascot-art {
+  display: block;
+  filter: drop-shadow(0 22px 30px rgba(0, 0, 0, 0.55));
+  height: auto;
+  width: 100%;
+
+  /* Start tucked down behind the row, then rise once. */
+  opacity: 0;
+  transform: translate3d(0, 34%, 0) scale(0.94);
+  transition:
+    opacity 0.5s var(--ease, ease-out),
+    /* Exponential ease-out. She decelerates into place rather than
+       overshooting - the rise reads as confident without the springiness
+       that dates a design. */
+    transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+.bridge-mascot[data-risen="true"] .bridge-mascot-art {
+  animation: bridge-mascot-idle 6.5s ease-in-out 0.9s infinite;
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+/* Weight shift, not a bounce - she is leaning, not jumping. */
+@keyframes bridge-mascot-idle {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  35% {
+    transform: translate3d(0, -6px, 0) rotate(-0.7deg);
+  }
+  70% {
+    transform: translate3d(0, -2px, 0) rotate(0.5deg);
+  }
+}
+
+/*
+ * Anchored to the tile row: her bottom sits 58px INSIDE the row, so her boots
+ * are hidden behind the "Testing and compliance" tile and she reads as
+ * standing up from behind it. right: 21% lands her over that fourth tile.
+ */
+.bridge-mascot-explore {
+  bottom: calc(100% - 74px);
+  right: 19%;
+  width: clamp(178px, 19vw, 268px);
+}
+
+@media (max-width: 900px) {
+  .bridge-mascot-explore {
+    bottom: calc(100% - 150px);
+    right: -9%;
+    width: 240px;
+  }
+}
+
+/* Bridge is a mobile-first product and she is its personality, so she ships
+   at roughly double the size she started at on phones. */
+@media (max-width: 620px) {
+  .bridge-mascot-explore {
+    bottom: calc(100% - 142px);
+    right: -22%;
+    width: 218px;
+  }
+}
+
+@media (max-width: 420px) {
+  .bridge-mascot-explore {
+    bottom: calc(100% - 128px);
+    right: -26%;
+    width: 196px;
+  }
+}
+
+/* ---- interactive: Tori asked to be able to light her pre-roll ---------- */
+
+/* As a button she has to accept the pointer the base rule refuses, and she
+   must not inherit any of the browser's button chrome. */
+.bridge-mascot-button {
+  appearance: none;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  padding: 0;
+  pointer-events: auto;
+}
+.bridge-mascot-button:focus-visible {
+  border-radius: 12px;
+  outline: 3px solid var(--accent);
+  outline-offset: 6px;
+}
+
+/* The lit tip of the pre-roll in her raised hand, measured off the 400x518
+   sprite: the ember sits at about 11% across and 27% down. */
+.bridge-mascot-ember {
+  background: radial-gradient(circle, rgba(255,214,140,.95) 0%, rgba(255,138,46,.72) 38%, rgba(255,92,20,0) 72%);
+  border-radius: 50%;
+  height: 13%;
+  left: 4%;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 21%;
+  transform: scale(.55);
+  transition: opacity .25s ease-out, transform .25s ease-out;
+  width: 13%;
+}
+.bridge-mascot-button[data-lit="true"] .bridge-mascot-ember {
+  animation: bridge-ember-flare 2.6s ease-out forwards;
+}
+
+@keyframes bridge-ember-flare {
+  0%   { opacity: 0;   transform: scale(.55); }
+  12%  { opacity: 1;   transform: scale(1.18); }
+  30%  { opacity: .78; transform: scale(.94); }
+  55%  { opacity: .95; transform: scale(1.06); }
+  100% { opacity: 0;   transform: scale(.72); }
+}
+
+/* She leans in when she draws. */
+.bridge-mascot-button[data-lit="true"] .bridge-mascot-art {
+  animation: bridge-mascot-draw 2.6s ease-in-out;
+}
+@keyframes bridge-mascot-draw {
+  0%, 100% { transform: translate3d(0,0,0) rotate(0deg); }
+  18%      { transform: translate3d(0,-9px,0) rotate(-1.4deg); }
+  46%      { transform: translate3d(0,-3px,0) rotate(.8deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* No flare and no lean, but pressing her still does something visible. */
+  .bridge-mascot-button[data-lit="true"] .bridge-mascot-ember {
+    animation: none;
+    opacity: 1;
+    transform: scale(1);
+  }
+  .bridge-mascot-button[data-lit="true"] .bridge-mascot-art { animation: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bridge-mascot-art,
+  .bridge-mascot[data-risen="true"] .bridge-mascot-art {
+    animation: none;
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

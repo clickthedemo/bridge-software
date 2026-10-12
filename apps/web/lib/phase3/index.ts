@@ -1,5 +1,7 @@
 export {
   audienceCatalog,
+  reachCatalog,
+  reachLabel,
   audienceLabel,
   allowedUploadTypes,
   canConfirmContacts,
@@ -20,14 +22,20 @@ export {
   applyUnverifiedOrganization,
 } from "./mock-client.ts";
 export { HttpPhase3Client } from "./http-client.ts";
+export { canEditOrganization, organizationTypeForRole, validateOrganizationInput } from "./organizations.ts";
+export type { OrganizationInput, OrganizationRecord, OrganizationType } from "./types.ts";
 export {
   Phase3Error,
   contentTypes,
   audienceIds,
   type AudienceId,
+  type AdminUser,
+  type AdminUsersResponse,
   type ConfirmContactsInput,
   type ConfirmContactsResult,
   type ContentType,
+  type CurrentUser,
+  type CurrentUserResponse,
   type CreatePostInput,
   type Phase3Client,
   type ProfileProjection,
@@ -36,4 +44,5 @@ export {
   type UpdateContactsInput,
   type UploadIntent,
   type PostRecord,
+  type OrganizationMembership,
 } from "./types.ts";
