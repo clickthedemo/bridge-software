@@ -21,7 +21,10 @@ const envSchema = z.object({
         .enum(["development", "test", "production"])
         .default("development"),
 
-    API_PORT: z.coerce.number().int().positive().default(4000),
+    // Render provides PORT; API_PORT remains available for local deployments.
+    API_PORT: z.coerce.number().int().positive().optional(),
+
+    PORT: z.coerce.number().int().positive().optional(),
 
     API_URL: z.url().default("http://localhost:4000"),
 
@@ -54,4 +57,7 @@ if (!result.success) {
     process.exit(1);
 }
 
-export const env = result.data;
+export const env = {
+    ...result.data,
+    API_PORT: result.data.API_PORT ?? result.data.PORT ?? 4000
+};
