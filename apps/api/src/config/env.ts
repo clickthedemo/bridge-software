@@ -81,7 +81,11 @@ const envSchema = z.object({
     EIN_ENCRYPTION_KEY_VERSION: z.coerce.number().int().positive().default(1)
 });
 
-const result = envSchema.safeParse(process.env);
+const result = envSchema.safeParse({
+    ...process.env,
+    // Render provides PORT; API_PORT remains available for local deployments.
+    API_PORT: process.env.API_PORT ?? process.env.PORT
+});
 
 if (!result.success) {
     console.error("Invalid environment configuration:");
