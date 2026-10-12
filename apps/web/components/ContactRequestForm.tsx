@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { contactReasons, submitContactRequest, type ContactReason } from "@/lib/contact";
+import { contactReasons, submitContactRequest, validateContactRequest, type ContactReason } from "@/lib/contact";
 
 type FormStatus = "idle" | "pending" | "success" | "error";
 
@@ -16,14 +16,16 @@ export function ContactRequestForm({ profileName, profileSlug }: { profileName: 
     event.preventDefault();
     if (status === "pending" || status === "success") return;
 
-    if (!note.trim()) {
-      setNoteError("Add a short note so the member knows why you are reaching out.");
+    const input = { profileSlug, reason, note };
+    const error = validateContactRequest(input);
+    if (error) {
+      setNoteError(error);
       return;
     }
     setNoteError("");
     setStatus("pending");
     try {
-      await submitContactRequest({ profileSlug, reason, note: note.trim() }, { simulateFailure });
+      await submitContactRequest(input, { simulateFailure });
       setStatus("success");
     } catch {
       setStatus("error");
@@ -33,22 +35,22 @@ export function ContactRequestForm({ profileName, profileSlug }: { profileName: 
   if (status === "success") {
     return (
       <div role="status">
-        <p className="eyebrow">Request sent</p>
-        <h2>Your request is pending.</h2>
+        <p className="eyebrow">Preview complete</p>
+        <h2>Nothing was sent or stored.</h2>
         <p>
-          {profileName} will see your {reason.toLowerCase()} note and can accept or decline. Contact details stay
-          private until they accept.
+          This is a simulated {reason.toLowerCase()} request for {profileName}. The member has not received your note.
         </p>
-        <p className="form-hint">Prototype: this submission was simulated and nothing was stored.</p>
+        <p className="form-hint">Sending and acceptance require the approved backend connection.</p>
+        <button className="button secondary" type="button" onClick={() => setStatus("idle")}>Edit preview</button>
       </div>
     );
   }
 
   return (
     <form noValidate onSubmit={handleSubmit}>
-      <p className="eyebrow">Make a connection</p>
+      <p className="eyebrow">Contact request preview</p>
       <h2>Contact {profileName}</h2>
-      <p>Share a concise reason for connecting. Direct contact details stay private until accepted.</p>
+      <p>Try the introduction form. This prototype does not send or store your note.</p>
 
       <label htmlFor="reason">Reason for contact</label>
       <select
@@ -76,12 +78,12 @@ export function ContactRequestForm({ profileName, profileSlug }: { profileName: 
 
       {status === "error" && (
         <p className="form-error" role="alert">
-          The request could not be sent. Your note is still here — try again.
+          The simulated preview failed. Nothing was sent. Your note is still here — try again.
         </p>
       )}
 
       <button className="button primary full" disabled={status === "pending"} type="submit">
-        {status === "pending" ? "Sending request…" : status === "error" ? "Try again" : "Send contact request"}
+        {status === "pending" ? "Preparing preview…" : status === "error" ? "Retry preview" : "Preview contact request"}
       </button>
 
       <details className="demo-controls">

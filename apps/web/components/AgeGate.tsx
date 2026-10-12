@@ -8,13 +8,14 @@ import {
   useRef,
   useState,
 } from "react";
+import { BridgeIntro } from "./BridgeIntro";
 import {
   AGE_GATE_CONFIRMED_VALUE,
   AGE_GATE_STORAGE_KEY,
   isAgeGateConfirmed,
 } from "@/lib/age-gate";
 
-type GateState = "checking" | "prompt" | "denied" | "allowed";
+type GateState = "checking" | "intro" | "prompt" | "denied" | "allowed";
 
 const focusableSelector = [
   "button:not([disabled])",
@@ -30,25 +31,39 @@ export function AgeGate({ children }: Readonly<{ children: ReactNode }>) {
   const dialogRef = useRef<HTMLDivElement>(null);
   const confirmRef = useRef<HTMLButtonElement>(null);
   const leaveRef = useRef<HTMLButtonElement>(null);
+  const confirmedRef = useRef(false);
   const isLocked = state !== "allowed";
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
+      let confirmed = false;
       try {
-        const confirmed = isAgeGateConfirmed(
+        confirmed = isAgeGateConfirmed(
           window.localStorage.getItem(AGE_GATE_STORAGE_KEY),
         );
-        setState(confirmed ? "allowed" : "prompt");
       } catch {
-        setState("prompt");
+        confirmed = false;
       }
+      confirmedRef.current = confirmed;
+
+      /* The cold open plays on every full page load, for returning visitors
+         too - it is the front door of the product, not a first-run tip. It
+         does not replay on client-side navigation, because this layout does
+         not remount. The one exception is reduced motion, since it sits in
+         front of a legal gate. */
+      const quiet = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (quiet) {
+        setState(confirmed ? "allowed" : "prompt");
+        return;
+      }
+      setState("intro");
     });
 
     return () => window.cancelAnimationFrame(frame);
   }, []);
 
   useEffect(() => {
-    if (!isLocked) {
+    if (!isLocked || state === "intro") {
       document.body.style.removeProperty("overflow");
       return;
     }
@@ -120,7 +135,12 @@ export function AgeGate({ children }: Readonly<{ children: ReactNode }>) {
       >
         {children}
       </div>
-      {isLocked && (
+      {state === "intro" && (
+        <BridgeIntro
+          onDone={() => setState(confirmedRef.current ? "allowed" : "prompt")}
+        />
+      )}
+      {isLocked && state !== "intro" && (
         <div className="age-gate" role="presentation">
           <div
             aria-describedby="age-gate-description"

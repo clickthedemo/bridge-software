@@ -3,7 +3,7 @@ import { StatusChip } from "@/components/StatusChip";
 export default function DesignSystemPage() {
   return (
     <section className="page shell">
-      <div className="page-heading"><p className="eyebrow">Provisional UI system</p><h1>Bridge building blocks.</h1><p className="lede">A small, reusable system for rapid iteration after Monday’s decisions.</p></div>
+      <div className="page-heading"><p className="eyebrow">Bridge UI system</p><h1>Bridge building blocks.</h1><p className="lede">A small, reusable system for rapid iteration after Monday’s decisions.</p></div>
       <div className="system-stack">
         <section className="content-card"><p className="eyebrow">Color tokens</p><div className="token-grid">{[["Brand", "var(--brand)"], ["Accent", "var(--accent)"], ["Signal", "var(--signal)"], ["Canvas", "var(--canvas)"], ["Surface", "var(--surface)"], ["Text", "var(--text)"]].map(([name, color]) => <div className="token" key={name}><span style={{ background: color }} /><strong>{name}</strong><small>{color}</small></div>)}</div></section>
         <section className="content-card"><p className="eyebrow">Typography</p><div className="type-samples"><h1>Connect with confidence.</h1><h2>Find a verified partner.</h2><h3>Profile overview</h3><p>Bridge helps cannabis businesses discover credible relationships through clear information and intentional introductions.</p><small>Supporting metadata · Updated July 11</small></div></section>

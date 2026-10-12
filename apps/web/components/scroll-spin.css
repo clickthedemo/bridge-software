@@ -1,0 +1,81 @@
+/* Scroll-linked frame-sequence spin. Ported from the Field Notes companion
+   (2026-09-03 Tori report): every angle is stacked and only `opacity` is
+   mutated, so the swap stays on the compositor and never flashes. */
+
+.bridge-spin-track {
+  position: relative;
+  height: 440vh;
+}
+
+.bridge-spin-sticky {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+}
+
+.bridge-spin-rig {
+  position: relative;
+  width: 330px;
+  height: 462px;
+  transform: scale(var(--bridge-spin-scale, 1));
+  will-change: transform;
+}
+
+.bridge-spin-frames {
+  position: absolute;
+  inset: 0;
+}
+
+.bridge-spin-frames img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: 50% 100%;
+  opacity: 0;
+}
+
+.bridge-spin-frames img:first-child {
+  opacity: 1;
+}
+
+/* Reduced motion is a different layout, not a disabled animation: the track
+   collapses, the sticky child goes static, one representative frame is shown. */
+@media (prefers-reduced-motion: reduce) {
+  .bridge-spin-track {
+    height: auto;
+  }
+
+  .bridge-spin-sticky {
+    position: static;
+    height: auto;
+    overflow: visible;
+    padding-block: clamp(48px, 8vw, 96px);
+  }
+
+  .bridge-spin-rig {
+    width: min(330px, 100%);
+    height: auto;
+    transform: none;
+  }
+
+  .bridge-spin-frames {
+    position: static;
+  }
+
+  .bridge-spin-frames img {
+    display: none;
+  }
+
+  .bridge-spin-frames img:first-child {
+    display: block;
+    position: static;
+    width: 100%;
+    height: auto;
+    opacity: 1;
+  }
+}

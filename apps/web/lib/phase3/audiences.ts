@@ -10,6 +10,25 @@ export const audienceCatalog: ReadonlyArray<{
   { id: "industry", label: "Industry professionals", publicSafe: false },
 ];
 
+export type ReachId = "world" | "state" | "b2b" | "public" | "everyone";
+
+/**
+ * Reach is who the author wants to see a post. It is a separate axis from
+ * audienceCatalog, which carries the 21+ / verified-access compliance gate.
+ * Tori asked for this on 2026-09-03: "who do you want to see this?"
+ */
+export const reachCatalog: ReadonlyArray<{ id: ReachId; label: string; hint: string }> = [
+  { id: "world", label: "The world", hint: "Every market Bridge covers" },
+  { id: "state", label: "Your state", hint: "Your home market only" },
+  { id: "b2b", label: "B2B", hint: "Verified businesses, not public users" },
+  { id: "public", label: "Public users", hint: "Consumers browsing Bridge" },
+  { id: "everyone", label: "Everyone", hint: "Public users and businesses together" },
+];
+
+export function reachLabel(id: ReachId | string): string {
+  return reachCatalog.find((item) => item.id === id)?.label ?? id;
+}
+
 export const allowedUploadTypes = [
   "image/png",
   "image/jpeg",

@@ -1,0 +1,431 @@
+/*
+ * Scrapbook cold open. Everything is layered over a near-black ground with
+ * grain on top, so the pieces read as paper on a table rather than UI.
+ */
+
+.bridge-intro {
+  align-items: center;
+  background:
+    radial-gradient(circle at 50% 46%, color-mix(in srgb, var(--brand) 52%, transparent), transparent 88%),
+    var(--canvas);
+  block-size: 100dvh;
+  bottom: 0;
+  cursor: pointer;
+  display: grid;
+  justify-items: center;
+  left: 0;
+  overflow: hidden;
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: 200;
+}
+
+.bridge-intro[data-leaving] {
+  animation: bi-out 0.32s ease-in forwards;
+}
+
+@keyframes bi-out {
+  to {
+    opacity: 0;
+    transform: scale(1.04);
+  }
+}
+
+/* feTurbulence rather than an image request, same trick as the companion. */
+.bridge-intro-grain {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");
+  inset: 0;
+  mix-blend-mode: overlay;
+  opacity: 0.16;
+  pointer-events: none;
+  position: absolute;
+  z-index: 6;
+}
+
+/* ---- ephemera ---------------------------------------------------------- */
+
+.bi-ephemera {
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 2;
+}
+
+/* Each piece slams in on its own beat, none of them centred, all rotated. */
+.bi-tape-a {
+  animation: bi-slam 0.34s var(--ease-heavy, ease-out) 0.12s forwards;
+  left: 4%;
+  object-fit: cover;
+  object-position: 12% 22%;
+  top: 6%;
+  transform: rotate(-13deg);
+  width: clamp(120px, 22vw, 260px);
+}
+
+.bi-tape-b {
+  animation: bi-slam 0.34s var(--ease-heavy, ease-out) 0.78s forwards;
+  bottom: 7%;
+  object-fit: cover;
+  object-position: 68% 54%;
+  right: 3%;
+  transform: rotate(9deg);
+  width: clamp(110px, 20vw, 230px);
+}
+
+.bi-leaf-a {
+  animation: bi-drop 0.42s var(--ease-heavy, ease-out) 0.42s forwards;
+  left: 7%;
+  bottom: 18%;
+  transform: rotate(18deg);
+  width: clamp(80px, 14vw, 170px);
+}
+
+.bi-leaf-b {
+  animation: bi-drop 0.42s var(--ease-heavy, ease-out) 1.18s forwards;
+  right: 8%;
+  top: 13%;
+  transform: rotate(-26deg);
+  width: clamp(70px, 12vw, 150px);
+}
+
+.bi-arrow {
+  animation: bi-slam 0.3s var(--ease-heavy, ease-out) 1.5s forwards;
+  bottom: 28%;
+  left: 16%;
+  transform: rotate(-8deg);
+  width: clamp(90px, 16vw, 190px);
+}
+
+.bi-stamp {
+  animation: bi-stamp-hit 0.26s var(--ease-heavy, ease-out) 1.92s forwards;
+  filter: hue-rotate(-118deg);
+  right: 12%;
+  top: 27%;
+  width: clamp(84px, 13vw, 150px);
+}
+
+.bi-smoke {
+  animation: bi-smoke-column 5s linear 0s forwards;
+  bottom: -30%;
+  left: 50%;
+  opacity: .34;
+  width: clamp(420px, 92vw, 1000px);
+}
+
+/* A second, slower column offset behind it so the smoke never reads as one
+   flat sheet. */
+.bi-smoke-back {
+  animation: bi-smoke-column 6.4s linear 0.3s forwards;
+  bottom: -40%;
+  left: 34%;
+  transform: translate(-50%, 0) scale(1.3);
+  opacity: .22;
+  width: clamp(480px, 110vw, 1200px);
+  z-index: 1;
+}
+
+@keyframes bi-slam {
+  from { opacity: 0; transform: translate3d(0, 26px, 0) rotate(var(--r, -13deg)) scale(1.16); }
+  to { opacity: 0.9; }
+}
+
+@keyframes bi-drop {
+  from { opacity: 0; transform: translate3d(0, -30px, 0) scale(0.86); }
+  to { opacity: 0.85; }
+}
+
+@keyframes bi-stamp-hit {
+  0% { opacity: 0; transform: rotate(-16deg) scale(2.1); }
+  70% { opacity: 1; transform: rotate(-16deg) scale(0.94); }
+  100% { opacity: 0.92; transform: rotate(-16deg) scale(1); }
+}
+
+/* Rises the full height of the frame across the whole run. */
+@keyframes bi-smoke-column {
+  from { opacity: 0; transform: translate(-50%, 26%) scale(1); }
+  20% { opacity: 0.34; }
+  70% { opacity: 0.28; }
+  to { opacity: 0.12; transform: translate(-50%, -70%) scale(1.4); }
+}
+
+/* ---- guitar ------------------------------------------------------------ */
+
+.bi-guitar {
+  animation: bi-guitar-sweep 1.1s var(--ease-heavy, ease-out) 0.28s forwards;
+  color: color-mix(in srgb, var(--accent) 52%, transparent);
+  height: auto;
+  left: 50%;
+  opacity: 0;
+  position: absolute;
+  top: 52%;
+  width: clamp(420px, 92vw, 1080px);
+  z-index: 1;
+}
+
+@keyframes bi-guitar-sweep {
+  from { opacity: 0; transform: translate(-50%, -50%) rotate(-38deg) scale(1.5); }
+  to { opacity: 0.5; transform: translate(-50%, -50%) rotate(-19deg) scale(1); }
+}
+
+/* ---- wordmark ---------------------------------------------------------- */
+
+.bi-stage::before {
+  background: radial-gradient(ellipse 66% 50% at 50% 50%, rgba(6, 4, 10, .9), rgba(6, 4, 10, .6) 58%, transparent 80%);
+  content: "";
+  inset: -18% -14%;
+  pointer-events: none;
+  position: absolute;
+  z-index: -1;
+}
+
+.bi-stage {
+  display: grid;
+  /* Above the grain and the film: nothing overlays the wordmark. */
+  z-index: 7;
+  gap: 6px;
+  justify-items: center;
+  position: relative;
+  text-align: center;
+  padding-inline: 20px;
+}
+
+.bi-kicker {
+  animation: bi-fade-up 0.5s var(--ease, ease-out) 0.05s both;
+  color: color-mix(in srgb, var(--accent) 88%, white);
+  font-family: var(--font-subhead);
+  font-size: clamp(0.6rem, 1.9vw, 0.76rem);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.bi-word {
+  display: flex;
+  font-family: var(--font-display);
+  font-size: clamp(4rem, 23vw, 19rem);
+  font-weight: 800;
+  gap: 0.01em;
+  letter-spacing: -0.055em;
+  line-height: 0.94;
+  margin: 0;
+}
+
+/* The wordmark reads from the first frame. It only settles, it does not
+   arrive - waiting for six staggered letters wasted the opening beat. */
+.bi-letter {
+  animation: bi-letter-in 0.26s var(--ease-heavy, ease-out) both;
+  display: inline-block;
+}
+
+@keyframes bi-letter-in {
+  from { opacity: .55; transform: translate3d(0, 10px, 0) scale(0.97); }
+  to { opacity: 1; }
+}
+
+/* The wordmark is solid cream by default. Individual letters take an art
+   fill for a beat and hand it back, so the word stays readable throughout and
+   lands clean - the companion's letter cycler, not a whole-word swap. */
+.bi-word { color: #F6F1E6; }
+
+.bi-letter[data-t] {
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+/* Graffiti wildstyle. */
+.bi-letter[data-t="0"] {
+  background-image: url("/intro/plates/graffiti.webp");
+  background-position: center 45%;
+  background-size: 112% auto;
+}
+/* Punk zine collage. */
+.bi-letter[data-t="1"] {
+  background-image: url("/intro/plates/zine.webp");
+  background-position: center 45%;
+  background-size: 104% auto;
+}
+/* Herbarium specimen sheet. */
+.bi-letter[data-t="2"] {
+  background-image: url("/intro/plates/botanical.webp");
+  background-position: center 40%;
+  background-size: 180% auto;
+}
+/* Lepidoptery plate. */
+.bi-letter[data-t="3"] {
+  background-image: url("/intro/plates/butterflies.webp");
+  background-position: center 42%;
+  background-size: 190% auto;
+}
+/* Hand drawn guitars. */
+.bi-letter[data-t="4"] {
+  background-image: url("/intro/plates/guitars.webp");
+  background-position: center 45%;
+  background-size: 150% auto;
+}
+/* Swallows in flight. */
+.bi-letter[data-t="5"] {
+  background-image: url("/intro/plates/birds.webp");
+  background-position: center 45%;
+  background-size: 150% auto;
+}
+/* Celestial chart. */
+.bi-letter[data-t="6"] {
+  background-image: url("/intro/plates/celestial.webp");
+  background-position: center 50%;
+  background-size: 200% auto;
+}
+/* Peace signs and suns. */
+.bi-letter[data-t="7"] {
+  background-image: url("/intro/plates/peace.webp");
+  background-position: center 45%;
+  background-size: 150% auto;
+}
+/* Cannabis leaves. */
+.bi-letter[data-t="8"] {
+  background-image: url("/intro/plates/weed.webp");
+  background-position: center 45%;
+  background-size: 140% auto;
+}
+/* Guitar patent plate. */
+.bi-letter[data-t="9"] {
+  background-image: url("/intro/plates/guitar.webp");
+  background-position: center 46%;
+  background-size: 200% auto;
+}
+/* Chrome bevel. */
+.bi-letter[data-t="10"] {
+  background-image: linear-gradient(178deg, #fff 8%, #cbb6e8 34%, #7a5aa4 54%, #fff 64%, #b08fd6 86%);
+}
+
+/* Spray stencil. */
+.bi-letter[data-t="11"] {
+  background-image: linear-gradient(180deg, var(--accent), var(--brand));
+}
+
+/* Chromatic misregistration. */
+.bi-letter[data-t="12"] {
+  background-image: none;
+  color: #fff;
+  text-shadow: 3px 0 0 var(--signal), -3px 0 0 var(--accent);
+}
+
+/* Neon tube. */
+.bi-letter[data-t="13"] {
+  background-image: none;
+  color: var(--accent);
+  text-shadow: 0 0 10px color-mix(in srgb, var(--accent) 80%, transparent), 0 0 34px color-mix(in srgb, var(--brand) 85%, transparent);
+}
+
+/* Resolved: every letter clean cream, the way the reference lands. */
+.bi-word[data-resolved] .bi-letter {
+  background-image: none;
+  color: #F6F1E6;
+  transition: color .35s ease-out;
+}
+
+.bi-underline {
+  animation: bi-rule 0.5s var(--ease-heavy, ease-out) 1.05s both;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  block-size: 3px;
+  inline-size: min(420px, 68vw);
+  transform-origin: center;
+}
+
+@keyframes bi-rule {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+.bi-hand {
+  animation: bi-fade-up 0.5s var(--ease, ease-out) 1.35s both;
+  color: color-mix(in srgb, #fff 82%, transparent);
+  font-family: var(--font-hand);
+  font-size: clamp(1.1rem, 4.4vw, 1.7rem);
+  transform: rotate(-1.8deg);
+}
+
+@keyframes bi-fade-up {
+  from { opacity: 0; transform: translate3d(0, 12px, 0); }
+  to { opacity: 1; }
+}
+
+/* ---- skip -------------------------------------------------------------- */
+
+.bi-skip {
+  background: color-mix(in srgb, var(--canvas) 70%, transparent);
+  border: 1px solid color-mix(in srgb, #fff 26%, transparent);
+  border-radius: 999px;
+  bottom: max(22px, env(safe-area-inset-bottom, 0px));
+  color: #fff;
+  cursor: pointer;
+  font-family: var(--font-subhead);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  min-height: 44px;
+  padding: 0 22px;
+  position: absolute;
+  right: 20px;
+  text-transform: uppercase;
+  z-index: 8;
+}
+
+.bi-skip:hover {
+  background: color-mix(in srgb, var(--brand) 60%, var(--canvas));
+}
+
+/*
+ * Decoration in front of a legal gate. Anyone who has asked for less motion
+ * gets none of it, and the gate is reached immediately - the component itself
+ * also refuses to mount in that case.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .bridge-intro,
+  .bridge-intro * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Tall phone screens leave the middle third doing all the work unless the
+   pieces grow and spread. */
+@media (max-width: 620px) {
+  .bi-tape-a { top: 7%; width: 42vw; }
+  .bi-tape-b { bottom: 8%; width: 40vw; }
+  .bi-leaf-a { bottom: 20%; width: 30vw; }
+  .bi-leaf-b { top: 15%; width: 27vw; }
+  .bi-arrow { bottom: 30%; left: 8%; width: 34vw; }
+  .bi-stamp { top: 24%; right: 8%; width: 26vw; }
+  .bi-smoke { width: 120vw; bottom: -14%; }
+  .bi-guitar { width: 150vw; }
+  /* 21vw overflowed the right edge on a 430px screen. */
+  .bi-word { font-size: clamp(3.4rem, 21.5vw, 9rem); }
+  /* The marker-hand treatment sets wider, so it gets its own phone size. */
+  .bi-word[data-treatment="13"] { font-size: clamp(3.2rem, 20vw, 9rem); }
+}
+
+/* Particle finale: smoke off the wordmark, gathering into the arch mark. */
+/* The smoke film sits behind everything. Contained rather than covered so
+   the arch it forms is never cropped; the letterboxing is black on black. */
+.bi-film {
+  block-size: 100%;
+  inline-size: 100%;
+  inset: 0;
+  object-fit: contain;
+  opacity: 0.92;
+  pointer-events: none;
+  position: absolute;
+  z-index: 0;
+}
+
+/* The stage steps back as the particles take over. */
+.bridge-intro[data-gathering] .bi-stage,
+.bridge-intro[data-gathering] .bi-ephemera,
+.bridge-intro[data-gathering] .bi-guitar {
+  opacity: 0;
+  transition: opacity 0.6s ease-out;
+}
+
+/* The film carries the ending, so the stage clears out of its way. */
+.bridge-intro[data-gathering] .bi-film { opacity: 1; transition: opacity .6s ease-out; }

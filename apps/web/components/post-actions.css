@@ -1,0 +1,88 @@
+/*
+ * Repost and save controls for one post.
+ *
+ * The repost count is public - it is the whole point of reposting, the visible
+ * sign that a drop is travelling. The save count is not rendered at all, for
+ * anyone: a private save stays private.
+ */
+
+.bridge-post-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.bridge-post-action {
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--muted);
+  cursor: pointer;
+  display: inline-flex;
+  font-family: var(--font-subhead);
+  font-size: 0.78rem;
+  font-weight: 750;
+  gap: 7px;
+  /* Phone-first: this is the real touch target, not a desktop control that
+     someone shrinks later. */
+  min-height: 44px;
+  padding: 0 15px;
+  transition:
+    background 0.18s var(--ease, ease),
+    border-color 0.18s var(--ease, ease),
+    color 0.18s var(--ease, ease);
+}
+
+.bridge-post-action:hover {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  color: var(--text);
+}
+
+.bridge-post-action[aria-pressed="true"] {
+  background: color-mix(in srgb, var(--accent) 15%, var(--surface));
+  border-color: color-mix(in srgb, var(--accent) 52%, transparent);
+  /* Pulled toward --text: the raw accent on its own tint measured 3.8:1 in the
+     two light directions, under the 4.5:1 this 12px label needs. */
+  color: color-mix(in srgb, var(--accent) 74%, var(--text));
+}
+
+.bridge-post-glyph {
+  display: block;
+  height: 17px;
+  width: 17px;
+}
+
+.bridge-post-glyph svg {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+/* The saved bookmark reads as filled; the repost arrows must stay outlines. */
+.bridge-post-save[aria-pressed="true"] .bridge-post-glyph svg {
+  fill: color-mix(in srgb, var(--accent) 34%, transparent);
+}
+
+/* The chip lays a second tint under an 11.5px numeral, so it cannot inherit the
+   label colour beside it: on that tint --muted measured 4.33:1 (botanical) and
+   4.49:1 (current), under the 4.5:1 this size needs. Pulled toward --text. */
+.bridge-post-count {
+  background: color-mix(in srgb, var(--text) 9%, transparent);
+  border-radius: 999px;
+  color: color-mix(in srgb, var(--muted) 40%, var(--text));
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+  padding: 2px 8px;
+}
+
+.bridge-post-action[aria-pressed="true"] .bridge-post-count {
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  color: color-mix(in srgb, var(--accent) 55%, var(--text));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bridge-post-action {
+    transition: none;
+  }
+}

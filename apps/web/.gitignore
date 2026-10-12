@@ -9,3 +9,6 @@ staging
 
 # Local Netlify folder
 .netlify
+
+# local visual-review captures
+review-shots/

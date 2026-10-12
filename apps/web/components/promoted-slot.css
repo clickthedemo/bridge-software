@@ -1,0 +1,30 @@
+/*
+ * Promoted marker. Sized off the status chip it sits beside so a card carrying
+ * both reads as one row of labels rather than two competing badges.
+ */
+
+.bridge-promoted {
+  align-items: center;
+  background: color-mix(in srgb, var(--accent) 13%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--accent) 34%, transparent);
+  border-radius: 999px;
+  color: var(--accent);
+  display: inline-flex;
+  font-family: var(--font-subhead);
+  font-size: 0.66rem;
+  font-weight: 850;
+  letter-spacing: 0.1em;
+  /* Dropped into .card-topline - a space-between row - as the middle child,
+     this pulls the marker across to the verification chip instead of stranding
+     it in the centre. Inline-level boxes ignore auto margins, so the chip is
+     unaffected when it sits in a sentence. */
+  margin-inline-start: auto;
+  padding: 0.34rem 0.6rem;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* The row it lands in has no gap of its own. */
+.bridge-promoted + * {
+  margin-inline-start: 8px;
+}

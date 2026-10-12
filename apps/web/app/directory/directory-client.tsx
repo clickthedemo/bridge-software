@@ -1,11 +1,14 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { LiveDirectory } from "@/components/LiveDirectory";
+import { isPhase3LiveApi } from "@/lib/phase3";
 import { ProfileCard } from "@/components/ProfileCard";
 import { profiles } from "@/lib/data";
 import { matchesQuery } from "@/lib/search";
 
-export function DirectoryClient() {
+export function DirectoryClient() { return isPhase3LiveApi() ? <LiveDirectory /> : <><p className="boundary-note">Preview mode · fictional sample profiles</p><SampleDirectoryClient /></>; }
+function SampleDirectoryClient() {
   const [query, setQuery] = useState("");
   const [role, setRole] = useState("All roles");
   const [verifiedOnly, setVerifiedOnly] = useState(false);
