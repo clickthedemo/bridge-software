@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: bridge-software-backend
+    runtime: node
+    rootDir: apps/api
+    buildCommand: npm ci --include=dev && npm run build
+    startCommand: node dist/server.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: PASSWORD_RESET_REDIRECT_URL
+        sync: false
+      - key: WEB_URL
+        sync: false
+      - key: API_URL
+        sync: false

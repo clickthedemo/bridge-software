@@ -21,10 +21,7 @@ const envSchema = z.object({
         .enum(["development", "test", "production"])
         .default("development"),
 
-    // Render provides PORT; API_PORT remains available for local deployments.
-    API_PORT: z.coerce.number().int().positive().optional(),
-
-    PORT: z.coerce.number().int().positive().optional(),
+    API_PORT: z.coerce.number().int().positive().default(4000),
 
     API_URL: z.url().default("http://localhost:4000"),
 
@@ -49,7 +46,11 @@ const envSchema = z.object({
     EIN_ENCRYPTION_KEY_VERSION: z.coerce.number().int().positive().default(1)
 });
 
-const result = envSchema.safeParse(process.env);
+const result = envSchema.safeParse({
+    ...process.env,
+    // Render provides PORT; API_PORT remains available for local deployments.
+    API_PORT: process.env.API_PORT ?? process.env.PORT
+});
 
 if (!result.success) {
     console.error("Invalid environment configuration:");
@@ -57,7 +58,4 @@ if (!result.success) {
     process.exit(1);
 }
 
-export const env = {
-    ...result.data,
-    API_PORT: result.data.API_PORT ?? result.data.PORT ?? 4000
-};
+export const env = result.data;
