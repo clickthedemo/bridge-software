@@ -1,0 +1,53 @@
+/*
+ * Per-mode fields. Inputs, labels and hints already have a house style in
+ * globals.css, so this file only handles the grouping, the counter and the
+ * invalid state.
+ */
+
+.pm-fields {
+  border-block: 1px solid var(--border);
+  border-inline: 0;
+  display: grid;
+  gap: 6px;
+  margin-block: 12px 4px;
+  padding-block: 14px;
+}
+
+.pm-fields legend {
+  color: var(--text);
+  font-size: 0.86rem;
+  font-weight: 850;
+  padding-right: 10px;
+}
+
+.pm-field {
+  display: grid;
+  gap: 4px;
+}
+
+.pm-field-optional {
+  color: var(--muted);
+  font-weight: 650;
+}
+
+.pm-field-count {
+  color: var(--muted);
+  font-size: 0.72rem;
+  justify-self: end;
+  margin: 0;
+}
+
+/* aria-invalid is the source of truth, so the outline cannot drift from it. */
+.pm-field [aria-invalid="true"] {
+  border-color: var(--danger);
+}
+
+.pm-fields-private {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 10px 10px 0;
+  color: var(--text);
+  font-size: 0.82rem;
+  margin: 8px 0 0;
+  padding: 10px 14px;
+}

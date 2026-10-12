@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { LiveDirectoryDetail } from "@/components/LiveDirectory";
+import { isPhase3LiveApi } from "@/lib/phase3";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -8,21 +10,20 @@ import { getProfile, profiles } from "@/lib/data";
 
 type ProfilePageProps = { params: Promise<{ slug: string }> };
 
-export const dynamicParams = false;
-
 export function generateStaticParams() {
   return profiles.map((profile) => ({ slug: profile.slug }));
 }
 
 export async function generateMetadata({ params }: ProfilePageProps): Promise<Metadata> {
   const { slug } = await params;
-  const profile = getProfile(slug);
-  return { title: profile ? `${profile.name} — Bridge` : "Member not found — Bridge" };
+  const profile = isPhase3LiveApi() ? null : getProfile(slug);
+  return { title: profile ? `${profile.name} — Bridge` : isPhase3LiveApi() ? "Member profile — Bridge" : "Member not found — Bridge" };
 }
 
 export default async function ProfilePage({ params }: ProfilePageProps) {
   const { slug } = await params;
-  const profile = getProfile(slug);
+  const profile = isPhase3LiveApi() ? null : getProfile(slug);
+  if (isPhase3LiveApi()) return <LiveDirectoryDetail key={slug} identifier={slug} />;
   if (!profile) notFound();
 
   return (
@@ -109,7 +110,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
             </>
           )}
         </article>
-        <aside className="contact-card">
+        <aside className="contact-card" id="contact-request" tabIndex={-1}>
           <ContactRequestForm profileName={profile.name} profileSlug={profile.slug} />
         </aside>
       </div>

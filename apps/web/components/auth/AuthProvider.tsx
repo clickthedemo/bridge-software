@@ -1,46 +1,67 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { authApi } from "@/lib/auth/api";
-import { authStorage } from "@/lib/auth/storage";
-import type { CurrentUser, OrganizationMembership } from "@/lib/auth/types";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { getPhase3Client, Phase3Error } from "@/lib/phase3";
+import type { CurrentUser, OrganizationMembership } from "@/lib/phase3";
 
 type AuthContextValue = {
-  status: "loading" | "authenticated" | "unauthenticated";
+  status: "loading" | "authenticated" | "unauthenticated" | "unavailable";
+  refresh(): Promise<void>;
   user: CurrentUser | null;
   memberships: OrganizationMembership[];
   isAdmin: boolean;
   login(email: string, password: string): Promise<{ isAdmin: boolean }>;
-  logout(): void;
+  logout(): Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const client = useMemo(() => getPhase3Client(), []);
   const [status, setStatus] = useState<AuthContextValue["status"]>("loading");
   const [user, setUser] = useState<CurrentUser | null>(null);
   const [memberships, setMemberships] = useState<OrganizationMembership[]>([]);
+  const requestVersion = useRef(0);
+
+  const checkSession = useCallback(() => {
+    const version = ++requestVersion.current;
+    return client.getCurrentUser().then((result) => {
+      if (version !== requestVersion.current) return;
+      setUser(result.user); setMemberships(result.memberships); setStatus("authenticated");
+    }).catch((cause: unknown) => {
+      if (version !== requestVersion.current) return;
+      setUser(null); setMemberships([]);
+      setStatus(cause instanceof Phase3Error && cause.code === "unauthenticated" ? "unauthenticated" : "unavailable");
+    });
+  }, [client]);
+
+  const refresh = useCallback(() => {
+    setStatus("loading");
+    return checkSession();
+  }, [checkSession]);
 
   useEffect(() => {
-    const session = authStorage.get();
-    if (!session) { queueMicrotask(() => setStatus("unauthenticated")); return; }
-    authApi.me(session.accessToken).then((result) => {
-      setUser(result.user); setMemberships(result.memberships); setStatus("authenticated");
-    }).catch(() => { authStorage.clear(); setStatus("unauthenticated"); });
-  }, []);
+    const requests = requestVersion;
+    void checkSession();
+    return () => { ++requests.current; };
+  }, [checkSession]);
 
-  async function login(email: string, password: string) {
-    const result = await authApi.login(email, password);
-    const session = { accessToken: result.accessToken, refreshToken: result.refreshToken,
-      expiresAt: result.expiresAt, expiresIn: result.expiresIn, tokenType: result.tokenType };
-    const identity = await authApi.me(result.accessToken);
-    authStorage.set(session); setUser(identity.user); setMemberships(identity.memberships); setStatus("authenticated");
+  const login = useCallback(async (email: string, password: string) => {
+    const version = ++requestVersion.current;
+    const identity = await client.login(email, password);
+    if (version !== requestVersion.current) throw new Error("Session changed during sign in. Please try again.");
+    setUser(identity.user); setMemberships(identity.memberships); setStatus("authenticated");
     return { isAdmin: identity.user.platformRoles.includes("admin") };
-  }
+  }, [client]);
 
-  function logout() { authStorage.clear(); setUser(null); setMemberships([]); setStatus("unauthenticated"); }
+  const logout = useCallback(async () => {
+    const version = ++requestVersion.current;
+    await client.logout();
+    if (version !== requestVersion.current) throw new Error("Session changed during sign out. Please try again.");
+    setUser(null); setMemberships([]); setStatus("unauthenticated");
+  }, [client]);
   const value = useMemo(() => ({ status, user, memberships,
-    isAdmin: user?.platformRoles.includes("admin") ?? false, login, logout }), [status, user, memberships]);
+    isAdmin: user?.platformRoles.includes("admin") ?? false, refresh, login, logout }), [status, user, memberships, refresh, login, logout]);
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

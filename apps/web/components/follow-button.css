@@ -1,0 +1,70 @@
+/*
+ * Follow / unfollow for one organization.
+ *
+ * There is deliberately no count in this file. Follower numbers are back-end
+ * data the owner sees on their own dashboard, so there is nothing here to hide
+ * with CSS - the number is never rendered in the first place.
+ */
+
+.bridge-follow {
+  align-items: center;
+  background: var(--brand);
+  border: 1px solid transparent;
+  border-radius: 999px;
+  box-shadow: 0 9px 24px color-mix(in srgb, var(--brand) 25%, transparent);
+  color: var(--on-brand);
+  cursor: pointer;
+  display: inline-flex;
+  font-family: var(--font-subhead);
+  font-size: 0.82rem;
+  font-weight: 780;
+  gap: 8px;
+  justify-content: center;
+  /* Phone-first touch target. */
+  min-height: 44px;
+  padding: 0 18px;
+  transition:
+    background 0.18s var(--ease, ease),
+    border-color 0.18s var(--ease, ease),
+    box-shadow 0.18s var(--ease, ease),
+    color 0.18s var(--ease, ease);
+}
+
+.bridge-follow:hover {
+  background: color-mix(in srgb, var(--accent) 28%, var(--brand));
+}
+
+/* Following is a settled state, not an invitation, so it drops back to a quiet
+   surface and lets the checked glyph carry the meaning. */
+.bridge-follow[aria-pressed="true"] {
+  background: var(--surface);
+  border-color: color-mix(in srgb, var(--accent) 48%, var(--border));
+  box-shadow: none;
+  color: var(--text);
+}
+
+.bridge-follow[aria-pressed="true"]:hover {
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+}
+
+.bridge-follow-glyph {
+  display: block;
+  height: 15px;
+  width: 15px;
+}
+
+.bridge-follow-glyph svg {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+.bridge-follow.full {
+  width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bridge-follow {
+    transition: none;
+  }
+}

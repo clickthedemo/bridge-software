@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { DirectoryEditor } from "@/components/DirectoryEditor";
 import {
   Phase3Error,
   audienceLabel,
@@ -28,7 +29,8 @@ function cloneContacts(contacts: ResponsibleContact[]): ResponsibleContact[] {
   return contacts.map((contact) => ({ ...contact }));
 }
 
-export function MyProfileClient() {
+export function MyProfileClient() { return isPhase3LiveApi() ? <DirectoryEditor /> : <><p className="boundary-note">Preview mode · illustrative profile and contacts</p><PreviewMyProfileClient /></>; }
+function PreviewMyProfileClient() {
   const client = useMemo(() => getPhase3Client(), []);
   const [mode, setMode] = useState<"public" | "protected">("protected");
   const [claims, setClaims] = useState<SessionClaims | null>(null);

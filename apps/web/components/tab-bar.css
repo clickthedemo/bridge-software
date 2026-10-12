@@ -1,0 +1,102 @@
+/*
+ * Bottom tab bar, phones only. Layout comes from the client's branding kit:
+ * five slots, raised purple "+" in the middle.
+ */
+
+.bridge-tabbar {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .bridge-tabbar {
+    -webkit-backdrop-filter: blur(18px) saturate(1.1);
+    backdrop-filter: blur(18px) saturate(1.1);
+    background: color-mix(in srgb, var(--canvas) 88%, transparent);
+    border-top: 1px solid color-mix(in srgb, #fff 12%, transparent);
+    bottom: 0;
+    display: block;
+    left: 0;
+    /* Clears the iPhone home indicator. */
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    position: fixed;
+    right: 0;
+    z-index: 60;
+  }
+
+  .bridge-tabbar ul {
+    align-items: center;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .bridge-tabbar .tab {
+    align-items: center;
+    color: color-mix(in srgb, var(--text) 62%, transparent);
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    justify-content: center;
+    min-height: 56px;
+    padding: 7px 2px 9px;
+    text-align: center;
+  }
+
+  .bridge-tabbar .tab[aria-current="page"] {
+    color: var(--text);
+  }
+
+  .bridge-tabbar .tab-glyph {
+    display: block;
+    height: 23px;
+    width: 23px;
+  }
+
+  .bridge-tabbar svg {
+    height: 100%;
+    width: 100%;
+  }
+
+  .bridge-tabbar .tab-label {
+    font-family: var(--font-subhead);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+
+  /* The raised "+" from the kit. */
+  .bridge-tabbar .tab.raised .tab-glyph {
+    align-items: center;
+    background: linear-gradient(160deg, var(--accent), var(--brand));
+    border-radius: 50%;
+    box-shadow: 0 8px 20px color-mix(in srgb, var(--brand) 55%, transparent);
+    color: #fff;
+    display: flex;
+    height: 46px;
+    justify-content: center;
+    margin-top: -20px;
+    width: 46px;
+  }
+
+  .bridge-tabbar .tab.raised svg {
+    height: 22px;
+    width: 22px;
+  }
+
+  .bridge-tabbar .tab.raised .tab-label {
+    color: color-mix(in srgb, var(--text) 72%, transparent);
+  }
+
+  /* Keep the last section clear of the bar. */
+  body {
+    padding-bottom: calc(74px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .bridge-tabbar {
+    background: var(--canvas);
+  }
+}

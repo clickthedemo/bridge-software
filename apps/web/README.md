@@ -98,3 +98,4 @@ npm run test:staging
 command checks the expected routes, provisional label, theme lock, and noindex
 metadata before a staging upload. Netlify's three connected projects use the
 single-direction commands so each project builds only its assigned preview.
+# bridge-software-frontend

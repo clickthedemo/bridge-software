@@ -1,7 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import { CONNECTED_REVIEW_LABEL, directionNames, isUnifiedReviewHost } from "@/lib/direction-lock";
+import { directionNames, isUnifiedReviewHost } from "@/lib/direction-lock";
 import { useTheme } from "@/lib/theme";
 
 function subscribe() {
@@ -19,10 +19,13 @@ function getServerSnapshot() {
 export function DirectionLockChip() {
   const theme = useTheme();
   const unified = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-  const label = unified ? CONNECTED_REVIEW_LABEL : "Provisional preview · " + directionNames[theme];
+  // The public-facing build carries no provisional labelling. The direction
+  // name is still useful while three design directions exist, but only off
+  // the unified review host.
+  if (unified) return null;
   return (
     <span className="status-chip preview-chip" suppressHydrationWarning>
-      {label}
+      {directionNames[theme]}
     </span>
   );
 }

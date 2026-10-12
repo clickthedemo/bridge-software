@@ -1,12 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 112" role="img" aria-labelledby="title">
-  <title id="title">Bridge arch mark</title>
-  <defs>
-    <linearGradient id="bridge-purple" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#7c3aed"/>
-      <stop offset="1" stop-color="#4b0082"/>
-    </linearGradient>
-  </defs>
-  <path d="M18 104V72C18 31.7 50.2 8 90 8s72 23.7 72 64v32" fill="none" stroke="url(#bridge-purple)" stroke-width="16"/>
-  <path d="M50 104V73c0-22.8 17.6-35 40-35s40 12.2 40 35v31" fill="none" stroke="url(#bridge-purple)" stroke-width="16"/>
-  <path d="M82 104V74c0-5.3 3.5-8 8-8s8 2.7 8 8v30" fill="none" stroke="url(#bridge-purple)" stroke-width="16"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="112" viewBox="0 0 180 112" role="img" aria-labelledby="bridge-mark-title">
+  <title id="bridge-mark-title">Bridge mark</title>
+  <!-- Client brand kit, 2026-07-20 Tori source package: three concentric arches, Deep Purple #4B0082 -->
+  <g fill="none" stroke="#4B0082" stroke-width="13" stroke-linecap="round">
+    <path d="M23 105V78a67 67 0 0 1 134 0v27"/>
+    <path d="M45 105V78a45 45 0 0 1 90 0v27"/>
+    <path d="M67 105V78a23 23 0 0 1 46 0v27"/>
+  </g>
 </svg>

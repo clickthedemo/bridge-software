@@ -9,7 +9,7 @@ export default function VerificationPage() {
           <h1>Verification queue</h1>
           <p className="lede">Review business identity, licenses, and profile readiness.</p>
         </div>
-        <span className="status-chip pending">14 awaiting review</span>
+        <span className="status-chip pending">Live queue</span>
       </div>
       <VerificationQueue />
     </section>
