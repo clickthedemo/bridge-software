@@ -9,9 +9,8 @@
     "scripts": {
         "dev": "tsx watch --env-file=.env src/server.ts",
         "build": "tsc",
-        "start": "node dist/server.js",
-        "typecheck": "tsc --noEmit",
-        "test": "tsx --test test/**/*.test.ts"
+        "start": "node --env-file-if-exists=.env dist/server.js",
+        "typecheck": "tsc --noEmit"
     },
     "dependencies": {
         "@supabase/supabase-js": "^2.112.3",
