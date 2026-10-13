@@ -25,12 +25,22 @@ const platformRoleRowSchema = z.object({
 const membershipRowSchema = z.object({
     user_id: z.uuid(),
     organization_id: z.uuid(),
-    role: z.enum(["owner", "admin", "reviewer", "member"]),
+    role: z.enum(["owner", "admin", "page_manager", "reviewer", "member"]),
     status: z.literal("active"),
     organizations: z.object({
         id: z.uuid(),
         name: z.string()
     })
+});
+
+export const parseAdminUserRows = (input: {
+    profiles: unknown;
+    roles: unknown;
+    memberships: unknown;
+}) => ({
+    profiles: z.array(profileRowSchema).parse(input.profiles),
+    roles: z.array(platformRoleRowSchema).parse(input.roles),
+    memberships: z.array(membershipRowSchema).parse(input.memberships)
 });
 
 export type AdminUserFailureCode =
@@ -308,22 +318,23 @@ export const listAdminUsers = async (query: AdminUsersQuery) => {
         throw new AdminUserServiceError("ADMIN_USERS_UNAVAILABLE");
     }
 
-    const profiles = z.array(profileRowSchema).safeParse(profilesResult.data);
-    const roles = z.array(platformRoleRowSchema).safeParse(rolesResult.data);
-    const memberships = z
-        .array(membershipRowSchema)
-        .safeParse(membershipsResult.data);
-
-    if (!profiles.success || !roles.success || !memberships.success) {
+    let rows: ReturnType<typeof parseAdminUserRows>;
+    try {
+        rows = parseAdminUserRows({
+            profiles: profilesResult.data,
+            roles: rolesResult.data,
+            memberships: membershipsResult.data
+        });
+    } catch {
         throw new AdminUserServiceError("INTERNAL_SERVER_ERROR");
     }
 
     return {
         users: combineAdminUserData(
             authData.users,
-            profiles.data,
-            roles.data,
-            memberships.data
+            rows.profiles,
+            rows.roles,
+            rows.memberships
         ),
         pagination: {
             page: query.page,

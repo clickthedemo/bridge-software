@@ -41,3 +41,13 @@ test("organization member management uses tenant-scoped credentialed routes", { 
     assert.equal(JSON.parse(String(calls[1]?.init?.body)).email, "person@example.com");
   } finally { globalThis.fetch = original; delete process.env.NEXT_PUBLIC_BRIDGE_API_BASE; }
 });
+
+test("contact requests preserve subject and retry idempotency", { concurrency: false }, async () => {
+  process.env.NEXT_PUBLIC_BRIDGE_API_BASE = "https://api.example.test";
+  const original = globalThis.fetch; let body = "";
+  globalThis.fetch = async (_input, init) => { body = String(init?.body); return new Response(JSON.stringify({ request: { id: "11111111-1111-4111-8111-111111111111", status: "new", createdAt: "2026-10-13T00:00:00Z" } }), { status: 201, headers: { "content-type": "application/json" } }); };
+  try {
+    await m4Api.createContactRequest("target", { idempotencyKey: "22222222-2222-4222-8222-222222222222", firstName: "A", workEmail: "a@example.com", phoneNumber: "+1 555 555 5555", yearsOfService: 2, contactPreference: "email", subject: "Inventory", message: "Hello" });
+    assert.deepEqual(JSON.parse(body), { idempotencyKey: "22222222-2222-4222-8222-222222222222", firstName: "A", workEmail: "a@example.com", phoneNumber: "+1 555 555 5555", yearsOfService: 2, contactPreference: "email", subject: "Inventory", message: "Hello" });
+  } finally { globalThis.fetch = original; delete process.env.NEXT_PUBLIC_BRIDGE_API_BASE; }
+});

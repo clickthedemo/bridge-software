@@ -108,6 +108,8 @@ export type DirectoryProfileFailureCode =
     | "DIRECTORY_PROFILE_REVIEW_UNAVAILABLE"
     | "DIRECTORY_PROFILE_INVALID_CURSOR"
     | "DIRECTORY_PROFILE_MEDIA_UNAVAILABLE"
+    | "DIRECTORY_PROFILE_MEDIA_INVALID"
+    | "DIRECTORY_PROFILE_MEDIA_CONTRACT_INVALID"
     | "DIRECTORY_PROFILE_READ_FAILED"
     | "DIRECTORY_PROFILE_WRITE_FAILED"
     | "INTERNAL_SERVER_ERROR";
@@ -507,8 +509,22 @@ export const createDirectoryProfileLogoUpload = async (
 
 const pendingUploadSchema = z.object({
     profile_id: z.uuid(), organization_id: z.uuid(), storage_path: z.string(),
-    content_type: z.string(), file_size: z.number(), completed_at: z.string().nullable()
+    content_type: z.string(), file_size: z.number(), completed_at: z.string().nullable(),
+    expires_at: z.string()
 });
+
+const hasExpectedLogoSignature = (bytes: Uint8Array, contentType: string): boolean => {
+    if (contentType === "image/png") {
+        return bytes.length >= 8 && [137, 80, 78, 71, 13, 10, 26, 10]
+            .every((value, index) => bytes[index] === value);
+    }
+    if (contentType === "image/jpeg") {
+        return bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
+    }
+    return bytes.length >= 12
+        && new TextDecoder().decode(bytes.slice(0, 4)) === "RIFF"
+        && new TextDecoder().decode(bytes.slice(8, 12)) === "WEBP";
+};
 
 export const completeDirectoryProfileLogoUpload = async (
     accessToken: string,
@@ -518,11 +534,12 @@ export const completeDirectoryProfileLogoUpload = async (
     await getDirectoryProfile(accessToken, organizationId);
     const admin = getAdminClient();
     const { data, error } = await admin.from("directory_profile_pending_uploads")
-        .select("profile_id, organization_id, storage_path, content_type, file_size, completed_at")
+        .select("profile_id, organization_id, storage_path, content_type, file_size, completed_at, expires_at")
         .eq("id", input.uploadId).eq("organization_id", organizationId).maybeSingle();
     const pending = pendingUploadSchema.safeParse(data);
-    if (error || !pending.success || pending.data.completed_at) {
-        throw new DirectoryProfileServiceError("DIRECTORY_PROFILE_MEDIA_UNAVAILABLE");
+    if (error || !pending.success || pending.data.completed_at
+        || Date.parse(pending.data.expires_at) <= Date.now()) {
+        throw new DirectoryProfileServiceError("DIRECTORY_PROFILE_MEDIA_CONTRACT_INVALID");
     }
     const slash = pending.data.storage_path.lastIndexOf("/");
     const prefix = pending.data.storage_path.slice(0, slash);
@@ -531,6 +548,17 @@ export const completeDirectoryProfileLogoUpload = async (
     const object = listed.data?.find((candidate) => candidate.name === filename);
     if (listed.error || !object) {
         throw new DirectoryProfileServiceError("DIRECTORY_PROFILE_MEDIA_UNAVAILABLE");
+    }
+    const downloaded = await admin.storage.from("directory-media").download(pending.data.storage_path);
+    if (downloaded.error || !downloaded.data) {
+        throw new DirectoryProfileServiceError("DIRECTORY_PROFILE_MEDIA_UNAVAILABLE");
+    }
+    const bytes = new Uint8Array(await downloaded.data.arrayBuffer());
+    if (bytes.byteLength !== pending.data.file_size
+        || downloaded.data.type !== pending.data.content_type
+        || !hasExpectedLogoSignature(bytes, pending.data.content_type)) {
+        await admin.storage.from("directory-media").remove([pending.data.storage_path]);
+        throw new DirectoryProfileServiceError("DIRECTORY_PROFILE_MEDIA_INVALID");
     }
     const client = createUserScopedSupabaseClient(accessToken);
     const { error: updateError } = await client.rpc("complete_directory_profile_logo_upload", {

@@ -10,11 +10,13 @@ export const organizationContactRequestParamsSchema = z.object({
 });
 
 export const createContactRequestSchema = z.object({
+    idempotencyKey: z.uuid().optional(),
     firstName: z.string().trim().min(1).max(100),
     workEmail: z.email().trim().max(320),
     phoneNumber: z.string().trim().min(7).max(32).regex(/^\+?[0-9 ()-]+$/),
     yearsOfService: z.number().int().min(0).max(80),
     contactPreference: z.enum(["email", "phone", "either"]),
+    subject: z.string().trim().min(1).max(200),
     message: z.string().trim().max(2000).nullable().optional()
 }).strict();
 

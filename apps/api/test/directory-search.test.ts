@@ -31,9 +31,9 @@ const migration = readFileSync(
     "utf8"
 ).replace(/\s+/g, " ").toLowerCase();
 
-const approvedOnlyMigration = readFileSync(
+const publishedRevisionMigration = readFileSync(
     new URL(
-        "../../../packages/database/supabase/migrations/20261013132000_phase_2e_approved_only_public_visibility.sql",
+        "../../../packages/database/supabase/migrations/20261013141000_phase_2f_preserve_published_logo.sql",
         import.meta.url
     ),
     "utf8"
@@ -196,19 +196,16 @@ test("eligibility excludes suspended, inactive, and no-longer-verified profiles"
     assert.match(migration, /public\.is_business_ein_verified\(b\.id\)/);
 });
 
-test("list and slug lookup require the current profile state to be approved", () => {
+test("a working revision preserves its approved snapshot while suspension remains hidden", () => {
     assert.match(
-        approvedOnlyMigration,
-        /p\.status = ''approved''::public\.directory_profile_status/
+        publishedRevisionMigration,
+        /p\.status <> ''suspended''::public\.directory_profile_status/
     );
     assert.match(
-        approvedOnlyMigration,
-        /and p\.status = 'approved'::public\.directory_profile_status/
+        publishedRevisionMigration,
+        /and p\.status <> 'suspended'::public\.directory_profile_status/
     );
-    assert.doesNotMatch(
-        approvedOnlyMigration,
-        /where v\.slug = lower\(btrim\(p_slug\)\)\s+and p\.status <>/
-    );
+    assert.match(publishedRevisionMigration, /v\.id = p\.published_version_id/);
 });
 
 test("search covers published display/summary and legal/DBA names case-insensitively", () => {

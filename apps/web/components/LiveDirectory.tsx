@@ -1,19 +1,19 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ContactRequestForm } from "@/components/M4ContactRequests";
+import { ProfileLogo } from "@/components/ProfileLogo";
 import { m4Api, type DirectoryPage, type DirectoryProfile, type DirectorySort, type OrganizationType } from "@/lib/m4/api";
 import { emptyDirectoryQuery, hasDirectoryFilters, parseDirectoryQuery, serializeDirectoryQuery, type DirectoryQueryState } from "@/lib/m4/directory-query-state";
 
 const types: Record<OrganizationType, string> = { brand: "Brand", retailer: "Retailer", dispensary: "Dispensary" };
 const errorText = (cause: unknown) => cause instanceof Error ? cause.message : "The directory could not be loaded.";
 
-function Identity({ profile, heading = "h2" }: { profile: DirectoryProfile; heading?: "h1" | "h2" }) {
+function Identity({ profile, heading = "h2", showLogo = true }: { profile: DirectoryProfile; heading?: "h1" | "h2"; showLogo?: boolean }) {
   const Heading = heading;
-  return <><div className="card-topline"><span className="avatar" aria-hidden="true">{profile.displayName.split(/\s+/).slice(0, 2).map((word) => word[0]).join("")}</span><span className="status-chip verified">Published</span></div><Heading>{profile.displayName}</Heading><p className="muted">{profile.businessType ? types[profile.businessType] : "Business"}</p>{profile.summary && <p>{profile.summary}</p>}</>;
+  return <><div className="card-topline">{showLogo && <ProfileLogo logoUrl={profile.logoUrl} name={profile.displayName} />}<span className="status-chip verified">Published</span></div><Heading>{profile.displayName}</Heading><p className="muted">{profile.businessType ? types[profile.businessType] : "Business"}</p>{profile.summary && <p>{profile.summary}</p>}</>;
 }
 
 export function LiveDirectory() {
@@ -24,6 +24,8 @@ export function LiveDirectory() {
   const [loading, setLoading] = useState(true); const [loadingMore, setLoadingMore] = useState(false); const [error, setError] = useState(""); const [revision, setRevision] = useState(0);
   const sentinel = useRef<HTMLDivElement>(null);
 
+  // Browser back/forward navigation is an external URL-state change that must replace local controls.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setFilters(initial); }, [initial]);
   useEffect(() => {
     const timer = window.setTimeout(() => { const query = serializeDirectoryQuery(filters); router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false }); }, 200);
@@ -63,5 +65,5 @@ export function LiveDirectoryDetail({ identifier }: { identifier: string }) {
   const [profile, setProfile] = useState<DirectoryProfile | null>(null); const [error, setError] = useState(""); const [revision, setRevision] = useState(0);
   useEffect(() => { let active = true; m4Api.getPublicProfile(identifier).then((value) => { if (active) setProfile(value); }).catch((cause) => { if (active) setError(errorText(cause)); }); return () => { active = false; }; }, [identifier, revision]);
   const website = profile?.links.find((link) => link.type === "website");
-  return <section className="page shell profile-page"><Link className="text-link back-link" href={backHref}>← Back to Directory</Link>{error ? <div className="empty-state"><h1>Profile unavailable</h1><p role="alert">{error}</p><button className="button secondary" onClick={() => setRevision((value) => value + 1)} type="button">Try again</button></div> : !profile ? <p role="status">Loading profile…</p> : <article className="content-card">{profile.logoUrl && <Image unoptimized alt={`${profile.displayName} logo`} height={96} src={profile.logoUrl} width={96} />}<Identity heading="h1" profile={profile} />{profile.story && <p>{profile.story}</p>}{profile.categories.length > 0 && <p className="tag-row">{profile.categories.map((category) => <span className="tag" key={category}>{category}</span>)}</p>}{profile.city && <p>{[profile.city, profile.state, profile.region].filter(Boolean).join(" · ")}</p>}{profile.publicContact.email && <p><a className="text-link" href={`mailto:${profile.publicContact.email}`}>Email this business</a></p>}{profile.publicContact.phone && <p><a className="text-link" href={`tel:${profile.publicContact.phone}`}>Call this business</a></p>}{website && <p><a className="text-link" href={website.url} rel="noreferrer" target="_blank">Visit website</a></p>}<section id="contact-request"><ContactRequestForm profileName={profile.displayName} slug={profile.slug} /></section></article>}</section>;
+  return <section className="page shell profile-page"><Link className="text-link back-link" href={backHref}>← Back to Directory</Link>{error ? <div className="empty-state"><h1>Profile unavailable</h1><p role="alert">{error}</p><button className="button secondary" onClick={() => setRevision((value) => value + 1)} type="button">Try again</button></div> : !profile ? <p role="status">Loading profile…</p> : <article className="content-card public-profile-card"><div className="public-profile-heading"><ProfileLogo logoUrl={profile.logoUrl} name={profile.displayName} size="detail" /><Identity heading="h1" profile={{ ...profile, logoUrl: null }} /></div>{profile.story && <p>{profile.story}</p>}{profile.categories.length > 0 && <p className="tag-row">{profile.categories.map((category) => <span className="tag" key={category}>{category}</span>)}</p>}<div className="public-profile-details">{profile.city && <p><strong>Location</strong><span>{[profile.city, profile.state, profile.region].filter(Boolean).join(" · ")}</span></p>}{profile.publicContact.email && <p><strong>Email</strong><a className="text-link" href={`mailto:${profile.publicContact.email}`}>{profile.publicContact.email}</a></p>}{profile.publicContact.phone && <p><strong>Phone</strong><a className="text-link" href={`tel:${profile.publicContact.phone}`}>{profile.publicContact.phone}</a></p>}{website && <p><strong>Website</strong><a className="text-link" href={website.url} rel="noreferrer" target="_blank">Visit website</a></p>}</div><section id="contact-request"><ContactRequestForm profileName={profile.displayName} slug={profile.slug} /></section></article>}</section>;
 }

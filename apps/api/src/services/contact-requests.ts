@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { z } from "zod";
 
 import { createUserScopedSupabaseClient } from "../lib/supabase.js";
@@ -21,7 +22,7 @@ const inboundRowSchema = z.object({
     routing_status: routingStatusSchema,
     first_name: z.string(), work_email: z.string(), phone_number: z.string(),
     years_of_service: z.number(), contact_preference: z.enum(["email", "phone", "either"]),
-    message: z.string().nullable(), created_at: z.string(), updated_at: z.string()
+    subject: z.string(), message: z.string().nullable(), created_at: z.string(), updated_at: z.string()
 });
 const sentRowSchema = z.object({
     request_id: z.uuid(), target_slug: z.string(), target_display_name: z.string(),
@@ -34,6 +35,7 @@ const transitionResultSchema = z.object({
 export type ContactRequestErrorCode =
     | "CONTACT_REQUEST_NOT_FOUND"
     | "CONTACT_REQUEST_INELIGIBLE"
+    | "CONTACT_REQUEST_RATE_LIMITED"
     | "CONTACT_REQUEST_INVALID_TRANSITION"
     | "CONTACT_REQUEST_FAILED";
 
@@ -45,6 +47,9 @@ export class ContactRequestServiceError extends Error {
 }
 
 const mapRpcError = (error: { code?: string; message?: string }): never => {
+    if (error.code === "P0001" && error.message?.toLowerCase().includes("rate limit")) {
+        throw new ContactRequestServiceError("CONTACT_REQUEST_RATE_LIMITED");
+    }
     if (error.code === "P0002") {
         throw new ContactRequestServiceError("CONTACT_REQUEST_NOT_FOUND");
     }
@@ -55,6 +60,7 @@ const mapRpcError = (error: { code?: string; message?: string }): never => {
                 : "CONTACT_REQUEST_INELIGIBLE"
         );
     }
+    console.error("Contact request database operation failed", { providerCode: error.code ?? "unknown" });
     throw new ContactRequestServiceError("CONTACT_REQUEST_FAILED");
 };
 
@@ -66,16 +72,23 @@ export const createContactRequest = async (
     const { data, error } = await createUserScopedSupabaseClient(accessToken)
         .rpc("create_contact_request", {
             p_target_slug: slug,
+            p_idempotency_key: input.idempotencyKey ?? randomUUID(),
             p_first_name: input.firstName,
             p_work_email: input.workEmail,
             p_phone_number: input.phoneNumber,
             p_years_of_service: input.yearsOfService,
             p_contact_preference: input.contactPreference,
+            p_subject: input.subject,
             p_message: input.message ?? null
         }).single();
     if (error) return mapRpcError(error);
     const parsed = createResultSchema.safeParse(data);
-    if (!parsed.success) throw new ContactRequestServiceError("CONTACT_REQUEST_FAILED");
+    if (!parsed.success) {
+        console.error("Contact request response validation failed", {
+            fields: data && typeof data === "object" ? Object.keys(data) : []
+        });
+        throw new ContactRequestServiceError("CONTACT_REQUEST_FAILED");
+    }
     return {
         request: {
             id: parsed.data.request_id,
@@ -107,7 +120,7 @@ export const listInboundContactRequests = async (
         routingStatus: row.routing_status, firstName: row.first_name,
         workEmail: row.work_email, phoneNumber: row.phone_number,
         yearsOfService: row.years_of_service,
-        contactPreference: row.contact_preference, message: row.message,
+        contactPreference: row.contact_preference, subject: row.subject, message: row.message,
         createdAt: row.created_at, updatedAt: row.updated_at
     })), pageInfo: { limit: query.limit, offset: query.offset, hasMore } };
 };

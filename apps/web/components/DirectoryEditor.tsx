@@ -23,6 +23,14 @@ export function DirectoryEditor() {
   const [website, setWebsite] = useState("");
   const [legalName, setLegalName] = useState("");
   const [dbaName, setDbaName] = useState("");
+  const [businessWebsite, setBusinessWebsite] = useState("");
+  const [employeeCount, setEmployeeCount] = useState("");
+  const [licenseNumber, setLicenseNumber] = useState("");
+  const [licenseType, setLicenseType] = useState<"medical" | "adult_use" | "dual">("adult_use");
+  const [issuingState, setIssuingState] = useState("");
+  const [expiresOn, setExpiresOn] = useState("");
+  const [licenseStatus, setLicenseStatus] = useState("");
+  const [licenseReason, setLicenseReason] = useState<string | null>(null);
   const [logo, setLogo] = useState<File | null>(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState("");
@@ -39,6 +47,17 @@ export function DirectoryEditor() {
       .then(([items, value, readiness]) => {
         if (!active) return;
         setBusinesses(items); setProfile(value);
+        const selectedBusiness = items.find((item) => item.id === value?.businessId) ?? items[0];
+        setBusinessWebsite(selectedBusiness?.websiteUrl ?? "");
+        setEmployeeCount(selectedBusiness?.employeeCount ? String(selectedBusiness.employeeCount) : "");
+        if (selectedBusiness && canSubmit) {
+          void m4Api.getBusinessLicense(selectedOrganizationId, selectedBusiness.id).then((result) => {
+            if (!active || !result?.license) return;
+            setLicenseNumber(result.license.licenseNumber); setLicenseType(result.license.licenseType);
+            setIssuingState(result.license.issuingState); setExpiresOn(result.license.expiresOn);
+            setLicenseStatus(result.license.status); setLicenseReason(result.license.reviewReason);
+          }).catch(() => undefined);
+        }
         setMissingSubmissionFields(readiness?.missingFields ?? []);
         const businessType = directoryProfileBusinessType(selectedMembership);
         if (value) {
@@ -55,7 +74,21 @@ export function DirectoryEditor() {
 
   async function createBusiness(event: FormEvent) {
     event.preventDefault(); setBusy("business"); setError("");
-    try { const created = await m4Api.createBusiness(selectedOrganizationId, { legalName: legalName.trim(), dbaName: dbaName.trim() || null }); setBusinesses((items) => [...items, created]); setDraft((value) => ({ ...value, businessId: created.id })); setNotice("Business created."); }
+    try { const created = await m4Api.createBusiness(selectedOrganizationId, { legalName: legalName.trim(), dbaName: dbaName.trim() || null, websiteUrl: businessWebsite.trim(), employeeCount: Number(employeeCount) }); setBusinesses((items) => [...items, created]); setDraft((value) => ({ ...value, businessId: created.id })); setNotice("Business created."); }
+    catch (cause) { setError(message(cause)); } finally { setBusy(""); }
+  }
+
+  async function saveBusiness(event: FormEvent) {
+    event.preventDefault(); const business = businesses.find((item) => item.id === draft.businessId) ?? businesses[0];
+    if (!business) return; setBusy("business-details"); setError("");
+    try { await m4Api.updateBusiness(selectedOrganizationId, business.id, { websiteUrl: businessWebsite.trim(), employeeCount: Number(employeeCount) }); setNotice("Protected business details saved."); setRevision((value) => value + 1); }
+    catch (cause) { setError(message(cause)); } finally { setBusy(""); }
+  }
+
+  async function saveLicense(event: FormEvent) {
+    event.preventDefault(); const business = businesses.find((item) => item.id === draft.businessId) ?? businesses[0];
+    if (!business) return; setBusy("license"); setError("");
+    try { const result = await m4Api.putBusinessLicense(selectedOrganizationId, business.id, { licenseNumber: licenseNumber.trim(), licenseType, issuingState: issuingState.trim(), expiresOn }); setLicenseStatus(result?.license.status ?? "pending"); setLicenseReason(result?.license.reviewReason ?? null); setNotice("Licence submitted for administrator verification."); }
     catch (cause) { setError(message(cause)); } finally { setBusy(""); }
   }
 
@@ -84,7 +117,9 @@ export function DirectoryEditor() {
       <select id="m4-org" required value={selectedOrganizationId} onChange={(event) => { setLoading(true); setOrganizationId(event.target.value); setRevision((value) => value + 1); }}>{organizations.map((item) => <option key={item.organizationId} value={item.organizationId}>{item.organizationName}</option>)}</select>
       {loading && <p role="status">Loading profile…</p>}{error && <p className="form-error" role="alert">{error}</p>}{notice && <p role="status">{notice}</p>}{profile?.workflowReason && <p className="boundary-note"><strong>Administrator feedback:</strong> {profile.workflowReason}</p>}
     </section>
-    {!loading && !businesses.length && <form className="content-card auth-form" onSubmit={createBusiness}><h2>Create business record</h2><label>Legal name (required)<input required maxLength={200} value={legalName} onChange={(event) => setLegalName(event.target.value)} /></label><label>DBA name (optional)<input maxLength={200} value={dbaName} onChange={(event) => setDbaName(event.target.value)} /></label><button className="button primary" disabled={!!busy}>Create business</button></form>}
+    {!loading && !businesses.length && <form className="content-card auth-form" onSubmit={createBusiness}><h2>Create business record</h2><label>Legal name (required)<input required maxLength={200} value={legalName} onChange={(event) => setLegalName(event.target.value)} /></label><label>DBA name (optional)<input maxLength={200} value={dbaName} onChange={(event) => setDbaName(event.target.value)} /></label><label>Business website (required, protected)<input required type="url" pattern="https://.*" value={businessWebsite} onChange={(event) => setBusinessWebsite(event.target.value)} /></label><label>Number of employees (required)<input required type="number" min={1} max={1000000} value={employeeCount} onChange={(event) => setEmployeeCount(event.target.value)} /></label><button className="button primary" disabled={!!busy}>Create business</button></form>}
+    {!loading && businesses.length > 0 && canSubmit && <form className="content-card auth-form" onSubmit={saveBusiness}><h2>Protected business details</h2><label>Business website (required; not published)<input required type="url" pattern="https://.*" value={businessWebsite} onChange={(event) => setBusinessWebsite(event.target.value)} /></label><label>Number of employees (required)<input required type="number" min={1} max={1000000} value={employeeCount} onChange={(event) => setEmployeeCount(event.target.value)} /></label><button className="button secondary" disabled={!!busy}>Save business details</button></form>}
+    {!loading && businesses.length > 0 && canSubmit && selectedMembership?.organizationType !== "brand" && <form className="content-card auth-form" onSubmit={saveLicense}><h2>Business licence</h2><p className="form-hint">All licence fields are required and remain protected. Status: {licenseStatus || "not submitted"}.</p>{licenseReason && <p className="boundary-note">Review feedback: {licenseReason}</p>}<label>Licence number (required)<input required maxLength={200} value={licenseNumber} onChange={(event) => setLicenseNumber(event.target.value)} /></label><label>Licence type (required)<select value={licenseType} onChange={(event) => setLicenseType(event.target.value as typeof licenseType)}><option value="medical">Medical</option><option value="adult_use">Adult use</option><option value="dual">Dual</option></select></label><label>Issuing state (required)<input required pattern="[A-Za-z]{2}" maxLength={2} value={issuingState} onChange={(event) => setIssuingState(event.target.value.toUpperCase())} /></label><label>Expiration date (required)<input required type="date" value={expiresOn} onChange={(event) => setExpiresOn(event.target.value)} /></label><button className="button secondary" disabled={!!busy}>{busy === "license" ? "Saving…" : "Save licence"}</button></form>}
     {!loading && businesses.length > 0 && <form className="content-card auth-form" onSubmit={save}>
       <div className="card-topline"><h2>Directory profile</h2>{profile?.status && <span className="status-chip pending">{profile.status.replaceAll("_", " ")}</span>}</div>
       {!editable && <p className="boundary-note">This profile cannot be edited while it is {profile?.status?.replaceAll("_", " ")}.</p>}
