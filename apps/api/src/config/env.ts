@@ -5,6 +5,11 @@ const optionalString = z.preprocess(
     z.string().min(1).optional()
 );
 
+const booleanString = z
+    .enum(["true", "false"])
+    .transform((value) => value === "true")
+    .default(false);
+
 const optionalEinEncryptionKey = z.preprocess(
     (value) => (value === "" ? undefined : value),
     z.string().refine((value) => {
@@ -59,6 +64,8 @@ const envSchema = z.object({
     DEPLOYMENT_ENVIRONMENT: z
         .enum(["development", "test", "staging", "production"])
         .optional(),
+
+    ENABLE_DEVELOPMENT_BOOTSTRAP: booleanString,
 
     SUPABASE_URL: z.url(),
 

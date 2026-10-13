@@ -98,6 +98,8 @@ const reviewResultSchema = z.object({
 export type DirectoryProfileFailureCode =
     | "DIRECTORY_PROFILE_NOT_FOUND"
     | "DIRECTORY_PROFILE_BUSINESS_MISMATCH"
+    | "DIRECTORY_PROFILE_VALIDATION_FAILED"
+    | "DIRECTORY_PROFILE_FORBIDDEN"
     | "DIRECTORY_PROFILE_BUSINESS_CHANGE_REQUIRES_REAPPROVAL"
     | "DIRECTORY_PROFILE_SLUG_CONFLICT"
     | "DIRECTORY_PROFILE_INVALID_STATE"
@@ -148,6 +150,11 @@ export interface ProtectedDirectoryProfileResponse {
         dbaName: string | null;
         status: "active" | "inactive" | "archived";
     };
+}
+
+export interface DirectoryProfileSubmissionReadinessResponse {
+    ready: boolean;
+    missingFields: string[];
 }
 
 export interface PublicDirectoryProfileResponse {
@@ -316,7 +323,7 @@ export const getDirectoryProfile = async (
     return projectProtectedDirectoryProfile(data);
 };
 
-const mapWriteError = (code: string | undefined): never => {
+export const mapDirectoryProfileWriteError = (code: string | undefined): never => {
     if (code === "23503") {
         throw new DirectoryProfileServiceError(
             "DIRECTORY_PROFILE_BUSINESS_MISMATCH"
@@ -324,6 +331,14 @@ const mapWriteError = (code: string | undefined): never => {
     }
     if (code === "23505") {
         throw new DirectoryProfileServiceError("DIRECTORY_PROFILE_SLUG_CONFLICT");
+    }
+    if (code === "23514") {
+        throw new DirectoryProfileServiceError(
+            "DIRECTORY_PROFILE_VALIDATION_FAILED"
+        );
+    }
+    if (code === "42501") {
+        throw new DirectoryProfileServiceError("DIRECTORY_PROFILE_FORBIDDEN");
     }
     if (code === "55000") {
         throw new DirectoryProfileServiceError(
@@ -359,7 +374,7 @@ export const putDirectoryProfile = async (
     });
 
     if (error) {
-        return mapWriteError(error.code);
+        return mapDirectoryProfileWriteError(error.code);
     }
 
     return getDirectoryProfile(accessToken, organizationId);
@@ -387,6 +402,24 @@ export const submitDirectoryProfile = async (
     }
 
     return getDirectoryProfile(accessToken, organizationId);
+};
+
+export const getDirectoryProfileSubmissionReadiness = async (
+    accessToken: string,
+    organizationId: string
+): Promise<DirectoryProfileSubmissionReadinessResponse> => {
+    const { data, error } = await createUserScopedSupabaseClient(accessToken)
+        .rpc("get_directory_profile_submission_missing_fields", {
+            p_organization_id: organizationId
+        });
+    if (error) {
+        if (error.code === "42501") throw new DirectoryProfileServiceError("DIRECTORY_PROFILE_FORBIDDEN");
+        if (error.code === "P0002") throw new DirectoryProfileServiceError("DIRECTORY_PROFILE_NOT_FOUND");
+        throw new DirectoryProfileServiceError("DIRECTORY_PROFILE_READ_FAILED");
+    }
+    const parsed = z.array(z.string()).safeParse(data ?? []);
+    if (!parsed.success) throw new DirectoryProfileServiceError("INTERNAL_SERVER_ERROR");
+    return { ready: parsed.data.length === 0, missingFields: parsed.data };
 };
 
 export const getPublicDirectoryProfile = async (

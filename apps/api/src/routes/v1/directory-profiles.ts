@@ -28,6 +28,7 @@ import {
     deleteDirectoryProfileLogo,
     DirectoryProfileServiceError,
     getDirectoryProfile,
+    getDirectoryProfileSubmissionReadiness,
     getProtectedDirectoryProfileLogoUrl,
     getPublicDirectoryProfileLogoUrl,
     listPublicDirectoryProfiles,
@@ -55,6 +56,8 @@ const sendDirectoryProfileError = (res: Response, error: unknown): void => {
     const statusByCode: Record<DirectoryProfileServiceError["code"], number> = {
         DIRECTORY_PROFILE_NOT_FOUND: 404,
         DIRECTORY_PROFILE_BUSINESS_MISMATCH: 400,
+        DIRECTORY_PROFILE_VALIDATION_FAILED: 422,
+        DIRECTORY_PROFILE_FORBIDDEN: 403,
         DIRECTORY_PROFILE_BUSINESS_CHANGE_REQUIRES_REAPPROVAL: 409,
         DIRECTORY_PROFILE_SLUG_CONFLICT: 409,
         DIRECTORY_PROFILE_INVALID_STATE: 409,
@@ -72,6 +75,10 @@ const sendDirectoryProfileError = (res: Response, error: unknown): void => {
         ? "Directory profile not found."
         : error.code === "DIRECTORY_PROFILE_BUSINESS_MISMATCH"
             ? "The selected business does not belong to this organization."
+            : error.code === "DIRECTORY_PROFILE_VALIDATION_FAILED"
+                ? "The Directory profile does not satisfy the organization or business rules."
+                : error.code === "DIRECTORY_PROFILE_FORBIDDEN"
+                    ? "You do not have permission to change this Directory profile."
             : error.code === "DIRECTORY_PROFILE_BUSINESS_CHANGE_REQUIRES_REAPPROVAL"
                 ? "The business association cannot be changed after approval."
                 : error.code === "DIRECTORY_PROFILE_SLUG_CONFLICT"
@@ -179,6 +186,19 @@ export const createSubmitDirectoryProfileHandler = (
             req.params.organizationId as string
         );
         res.status(200).json({ profile });
+    } catch (error) {
+        sendDirectoryProfileError(res, error);
+    }
+};
+
+export const createGetDirectoryProfileSubmissionReadinessHandler = (
+    service: typeof getDirectoryProfileSubmissionReadiness = getDirectoryProfileSubmissionReadiness
+): RequestHandler => async (req, res) => {
+    try {
+        res.status(200).json(await service(
+            req.authentication!.accessToken,
+            req.params.organizationId as string
+        ));
     } catch (error) {
         sendDirectoryProfileError(res, error);
     }
@@ -319,6 +339,15 @@ router.post(
     validateParams(directoryProfileOrganizationParamsSchema),
     requirePermission("business:update", organizationIdFromParams),
     createSubmitDirectoryProfileHandler()
+);
+
+router.get(
+    "/organizations/:organizationId/directory-profile/submission-readiness",
+    requireAuthentication,
+    loadApplicationIdentity,
+    validateParams(directoryProfileOrganizationParamsSchema),
+    requirePermission("business:update", organizationIdFromParams),
+    createGetDirectoryProfileSubmissionReadinessHandler()
 );
 
 router.post(

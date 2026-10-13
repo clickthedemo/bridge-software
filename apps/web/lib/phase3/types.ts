@@ -36,7 +36,7 @@ export type OrganizationMembership = {
   organizationId: string;
   organizationName: string;
   organizationType: "brand" | "retailer" | "dispensary" | null;
-  role: "owner" | "admin" | "reviewer" | "member";
+  role: "owner" | "admin" | "page_manager" | "reviewer" | "member";
   status: "active" | "invited" | "suspended" | "removed";
 };
 

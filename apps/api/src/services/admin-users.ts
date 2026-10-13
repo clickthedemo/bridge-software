@@ -120,6 +120,32 @@ const isDuplicateInvitation = (error: AdminAuthFailure): boolean => {
     );
 };
 
+const authUserExists = async (
+    client: ReturnType<typeof createAdminSupabaseClient>,
+    email: string
+): Promise<boolean> => {
+    const normalizedEmail = email.toLowerCase();
+    let page = 1;
+    while (true) {
+        const { data, error } = await client.auth.admin.listUsers({
+            page,
+            perPage: 1000
+        });
+        if (error) {
+            throw new AdminUserServiceError("ADMIN_USERS_UNAVAILABLE");
+        }
+        if (
+            data.users.some(
+                (user) => user.email?.toLowerCase() === normalizedEmail
+            )
+        ) {
+            return true;
+        }
+        if (data.users.length < 1000) return false;
+        page += 1;
+    }
+};
+
 export const inviteAdminUser = async (
     actorUserId: string,
     input: AdminUserInvitationInput
@@ -128,13 +154,33 @@ export const inviteAdminUser = async (
     let invitedUserId: string | undefined;
 
     try {
+        if (await authUserExists(client, input.email)) {
+            throw new AdminUserServiceError("ADMIN_USER_ALREADY_EXISTS");
+        }
+        const developmentLinkOnly =
+            env.NODE_ENV === "development" &&
+            env.ENABLE_DEVELOPMENT_BOOTSTRAP;
         const { data: invitationData, error: invitationError } =
-            await client.auth.admin.inviteUserByEmail(input.email, {
-                redirectTo: env.EMAIL_VERIFICATION_REDIRECT_URL,
-                data: { display_name: input.displayName }
-            });
+            developmentLinkOnly
+                ? await client.auth.admin.generateLink({
+                      type: "invite",
+                      email: input.email,
+                      options: {
+                          redirectTo: env.EMAIL_VERIFICATION_REDIRECT_URL,
+                          data: { display_name: input.displayName }
+                      }
+                  })
+                : await client.auth.admin.inviteUserByEmail(input.email, {
+                      redirectTo: env.EMAIL_VERIFICATION_REDIRECT_URL,
+                      data: { display_name: input.displayName }
+                  });
 
         if (invitationError) {
+            console.warn("Supabase administrator invitation failed", {
+                operation: "admin-invite-user",
+                providerCode: invitationError.code ?? "unknown",
+                status: invitationError.status ?? "unknown"
+            });
             if (isDuplicateInvitation(invitationError)) {
                 throw new AdminUserServiceError("ADMIN_USER_ALREADY_EXISTS");
             }
@@ -191,7 +237,7 @@ export const inviteAdminUser = async (
             displayName: input.displayName,
             accountType: input.accountType,
             platformRole: input.platformRole ?? null,
-            invitationSent: true as const
+            invitationSent: !developmentLinkOnly
         };
     } catch (error) {
         if (invitedUserId) {
