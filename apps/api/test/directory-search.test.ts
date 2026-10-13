@@ -25,7 +25,15 @@ const { createListPublicDirectoryProfilesHandler } = await import(
 
 const migration = readFileSync(
     new URL(
-        "../supabase/migrations/20261005152000_milestone_4_4_public_directory_search.sql",
+        "../../../packages/database/supabase/migrations/20261013130000_phase_2e_public_directory_search.sql",
+        import.meta.url
+    ),
+    "utf8"
+).replace(/\s+/g, " ").toLowerCase();
+
+const approvedOnlyMigration = readFileSync(
+    new URL(
+        "../../../packages/database/supabase/migrations/20261013132000_phase_2e_approved_only_public_visibility.sql",
         import.meta.url
     ),
     "utf8"
@@ -116,6 +124,10 @@ test("query validation bounds search, limit, cursor, sort, and filter", () => {
         false
     );
     assert.equal(publicDirectoryProfilesQuerySchema.safeParse({ category: "flower" }).success, true);
+    assert.equal(publicDirectoryProfilesQuerySchema.safeParse({ page: "0" }).success, false);
+    assert.equal(publicDirectoryProfilesQuerySchema.safeParse({ page: "-1" }).success, false);
+    assert.equal(publicDirectoryProfilesQuerySchema.safeParse({ q: "" }).success, true);
+    assert.equal(publicDirectoryProfilesQuerySchema.safeParse({ q: "%' OR 1=1 --" }).success, true);
     assert.equal(
         publicDirectoryProfilesQuerySchema.safeParse({ q: "x".repeat(101) })
             .success,
@@ -172,35 +184,61 @@ test("cursor rejects malformed payloads and a different selected sort", () => {
 });
 
 test("database list reads only the current immutable published snapshot", () => {
-    assert.match(migration, /join public\.directory_profile_versions dpv on dpv\.id = dp\.published_version_id/);
-    assert.match(migration, /dpv\.profile_id = dp\.id and dpv\.is_published/);
-    assert.doesNotMatch(migration, /select dp\.display_name/);
+    assert.match(migration, /join public\.directory_profile_versions v on v\.id = p\.published_version_id/);
+    assert.match(migration, /v\.profile_id = p\.id and v\.is_published/);
+    assert.doesNotMatch(migration, /select p\.display_name/);
 });
 
 test("eligibility excludes suspended, inactive, and no-longer-verified profiles", () => {
-    assert.match(migration, /dp\.status <> 'suspended'/);
+    assert.match(migration, /p\.status <> 'suspended'/);
     assert.match(migration, /o\.status = 'active'/);
     assert.match(migration, /b\.status = 'active'/);
     assert.match(migration, /public\.is_business_ein_verified\(b\.id\)/);
 });
 
-test("search covers published display/summary and legal/DBA names case-insensitively", () => {
-    assert.match(migration, /dpv\.display_name ilike/);
-    assert.match(migration, /coalesce\(dpv\.summary, ''\) ilike/);
-    assert.match(migration, /b\.legal_name ilike/);
-    assert.match(migration, /coalesce\(b\.dba_name, ''\) ilike/);
-    assert.match(migration, /replace\( replace\(replace\(normalized_query/);
+test("list and slug lookup require the current profile state to be approved", () => {
+    assert.match(
+        approvedOnlyMigration,
+        /p\.status = ''approved''::public\.directory_profile_status/
+    );
+    assert.match(
+        approvedOnlyMigration,
+        /and p\.status = 'approved'::public\.directory_profile_status/
+    );
+    assert.doesNotMatch(
+        approvedOnlyMigration,
+        /where v\.slug = lower\(btrim\(p_slug\)\)\s+and p\.status <>/
+    );
 });
 
-test("organization type is the only implemented public filter", () => {
-    assert.match(migration, /o\.organization_type = p_organization_type/);
-    assert.doesNotMatch(migration, /p_category|p_territory|p_product|p_city|p_state/);
+test("search covers published display/summary and legal/DBA names case-insensitively", () => {
+    assert.match(migration, /v\.display_name ilike/);
+    assert.match(migration, /coalesce\(v\.summary, ''\) ilike/);
+    assert.match(migration, /v\.legal_name ilike/);
+    assert.match(migration, /coalesce\(v\.dba_name, ''\) ilike/);
+    assert.match(migration, /replace\(replace\(replace\(normalized/);
+});
+
+test("business type, category, and normalized location filters are supported", () => {
+    assert.match(migration, /v\.business_type = p_organization_type/);
+    assert.match(migration, /lower\(c\.category\) = lower\(normalized_category\)/);
+    assert.match(migration, /lower\(v\.state\) = lower\(normalized_state\)/);
+    assert.match(migration, /lower\(v\.city\) = lower\(normalized_city\)/);
+    assert.match(migration, /lower\(v\.region\) = lower\(normalized_region\)/);
+});
+
+test("search covers summary, story, category, location, and business names", () => {
+    for (const field of ["display_name", "summary", "story", "legal_name", "dba_name", "city", "state"]) {
+        assert.match(migration, new RegExp(`v\\.${field}`));
+    }
+    assert.match(migration, /c\.category ilike/);
+    assert.match(migration, /replace\(replace\(replace\(normalized/);
 });
 
 test("ascending and descending sorts use normalized name plus slug", () => {
     assert.match(migration, /p_sort = 'name_asc'/);
     assert.match(migration, /p_sort = 'name_desc'/);
-    assert.match(migration, /lower\(dpv\.display_name\), lower\(dpv\.slug\)/);
+    assert.match(migration, /lower\(v\.display_name\), lower\(v\.slug\)/);
     assert.match(migration, /unsupported directory sort/);
 });
 
@@ -208,7 +246,7 @@ test("keyset predicates and bounded over-fetch support infinite scrolling", () =
     assert.match(migration, /> \(p_cursor_name, p_cursor_slug\)/);
     assert.match(migration, /< \(p_cursor_name, p_cursor_slug\)/);
     assert.match(migration, /p_limit < 1 or p_limit > 51/);
-    assert.match(migration, /length\(normalized_query\) > 100/);
+    assert.match(migration, /length\(normalized\) > 100/);
     assert.match(migration, /limit p_limit/);
     assert.doesNotMatch(migration, /\boffset\b/);
 });

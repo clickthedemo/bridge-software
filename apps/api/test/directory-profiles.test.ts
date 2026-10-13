@@ -288,7 +288,13 @@ test("approved profile cannot switch its verification business", () => {
     );
 });
 
-for (const hiddenStatus of ["draft", "pending_review", "suspended"] as const) {
+for (const hiddenStatus of [
+    "draft",
+    "pending_review",
+    "correction_requested",
+    "rejected",
+    "suspended"
+] as const) {
     test(`${hiddenStatus} profile is not publicly visible`, () => {
         assert.match(
             migration,

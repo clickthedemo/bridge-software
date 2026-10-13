@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { createUserScopedSupabaseClient } from "../lib/supabase.js";
-import type { CreateBusinessInput } from "../schemas/businesses.js";
+import type { CreateBusinessInput, PutBusinessContactInput } from "../schemas/businesses.js";
 
 const businessRowSchema = z.object({
     id: z.uuid(),
@@ -100,4 +100,14 @@ export const createBusiness = async (
     }
 
     return projectBusinessRow(data);
+};
+
+export const putBusinessContact = async (accessToken: string, organizationId: string, businessId: string, input: PutBusinessContactInput) => {
+    const { data, error } = await createUserScopedSupabaseClient(accessToken).rpc("put_business_contact", {
+        p_organization_id: organizationId, p_business_id: businessId, p_email: input.email, p_phone: input.phone
+    }).single();
+    if (error || !data) throw new BusinessServiceError("BUSINESS_CREATE_FAILED");
+    const parsed = z.object({ business_id: z.uuid(), contact_email: z.string(), contact_phone: z.string(), updated_at: z.string() }).safeParse(data);
+    if (!parsed.success) throw new BusinessServiceError("INTERNAL_SERVER_ERROR");
+    return { businessId: parsed.data.business_id, email: parsed.data.contact_email, phone: parsed.data.contact_phone, updatedAt: parsed.data.updated_at };
 };

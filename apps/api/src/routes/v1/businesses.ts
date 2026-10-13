@@ -6,13 +6,17 @@ import { requirePermission } from "../../middleware/authorization.js";
 import { validateBody, validateParams } from "../../middleware/validation.js";
 import {
     businessOrganizationParamsSchema,
+    businessContactParamsSchema,
     createBusinessSchema,
+    putBusinessContactSchema,
+    type PutBusinessContactInput,
     type CreateBusinessInput
 } from "../../schemas/businesses.js";
 import {
     BusinessServiceError,
     createBusiness,
-    listBusinesses
+    listBusinesses,
+    putBusinessContact
 } from "../../services/businesses.js";
 
 const router = Router();
@@ -99,6 +103,20 @@ router.post(
     requirePermission("business:update", organizationIdFromParams),
     validateBody(createBusinessSchema),
     createCreateBusinessHandler()
+);
+
+router.put(
+    "/organizations/:organizationId/businesses/:businessId/contact",
+    requireAuthentication, loadApplicationIdentity,
+    validateParams(businessContactParamsSchema),
+    requirePermission("business:update", organizationIdFromParams),
+    validateBody(putBusinessContactSchema),
+    async (req, res) => {
+        try {
+            const contact = await putBusinessContact(req.authentication!.accessToken, req.params.organizationId as string, req.params.businessId as string, req.body as PutBusinessContactInput);
+            res.status(200).json({ contact });
+        } catch (error) { sendBusinessError(res, error); }
+    }
 );
 
 export { router as businessesRouter };
