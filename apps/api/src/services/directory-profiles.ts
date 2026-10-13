@@ -393,7 +393,12 @@ export const submitDirectoryProfile = async (
         if (error.code === "P0002") {
             throw new DirectoryProfileServiceError("DIRECTORY_PROFILE_NOT_FOUND");
         }
-        if (error.code === "55000" || error.code === "23514") {
+        if (error.code === "23514") {
+            throw new DirectoryProfileServiceError(
+                "DIRECTORY_PROFILE_VALIDATION_FAILED"
+            );
+        }
+        if (error.code === "55000") {
             throw new DirectoryProfileServiceError(
                 "DIRECTORY_PROFILE_INVALID_STATE"
             );

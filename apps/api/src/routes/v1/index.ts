@@ -11,6 +11,7 @@ import { einRouter } from "./ein.js";
 import { notificationsRouter } from "./notifications.js";
 import { organizationsRouter } from "./organizations.js";
 import { organizationMembersRouter } from "./organization-members.js";
+import { organizationLocationsRouter } from "./organization-locations.js";
 import { sessionRouter } from "./session.js";
 import { systemRouter } from "./system.js";
 
@@ -32,6 +33,7 @@ router.use("/admin", adminVerificationRouter);
 router.use("/admin", adminDirectoryProfilesRouter);
 router.use("/organizations", organizationsRouter);
 router.use(organizationMembersRouter);
+router.use(organizationLocationsRouter);
 router.use(businessesRouter);
 router.use(contactRequestsRouter);
 router.use(directoryProfilesRouter);
