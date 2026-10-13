@@ -17,6 +17,8 @@ test("Directory loading state is limited to active loading and preserves query s
   assert.match(directory, /\{loading && <p role="status">Loading directory/);
   assert.match(directory, /finally\(\(\) => \{ if \(active\) setLoading\(false\)/);
   assert.match(directory, /serializeDirectoryQuery\(filters\)/);
+  assert.match(directory, /const search = searchParams\.toString\(\)/);
+  assert.match(directory, /if \(query !== search\) router\.replace/);
 });
 
 test("profile logo uses hidden-until-loaded image and initials fallback", () => {
@@ -51,4 +53,11 @@ test("Directory review deep links resolve the profile's current status queue", (
   assert.match(review, /setStatus\(result\.status\)/);
   assert.match(api, /for \(const status of \["pending_review", "approved", "correction_requested", "rejected", "suspended"\]/);
   assert.match(api, /if \(!page\.hasMore\) break/);
+});
+
+test("Directory review offers All while loading Pending Review by default", () => {
+  const review = source("../../components/AdminDirectoryReview.tsx");
+  assert.match(review, /\["", "pending_review", "approved", "correction_requested", "rejected", "suspended"\]/);
+  assert.match(review, /useState<ProfileStatus \| "">\("pending_review"\)/);
+  assert.match(review, /status \? \{ status \} : \{\}/);
 });

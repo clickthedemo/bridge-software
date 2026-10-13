@@ -18,7 +18,8 @@ function Identity({ profile, heading = "h2", showLogo = true }: { profile: Direc
 
 export function LiveDirectory() {
   const searchParams = useSearchParams(); const pathname = usePathname(); const router = useRouter();
-  const initial = useMemo(() => parseDirectoryQuery(new URLSearchParams(searchParams.toString())), [searchParams]);
+  const search = searchParams.toString();
+  const initial = useMemo(() => parseDirectoryQuery(new URLSearchParams(search)), [search]);
   const [filters, setFilters] = useState<DirectoryQueryState>(initial);
   const [result, setResult] = useState<DirectoryPage>({ profiles: [], pageInfo: { nextCursor: null, hasMore: false }, nextCursor: null, hasMore: false });
   const [loading, setLoading] = useState(true); const [loadingMore, setLoadingMore] = useState(false); const [error, setError] = useState(""); const [revision, setRevision] = useState(0);
@@ -28,9 +29,9 @@ export function LiveDirectory() {
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setFilters(initial); }, [initial]);
   useEffect(() => {
-    const timer = window.setTimeout(() => { const query = serializeDirectoryQuery(filters); router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false }); }, 200);
+    const timer = window.setTimeout(() => { const query = serializeDirectoryQuery(filters); if (query !== search) router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false }); }, 200);
     return () => window.clearTimeout(timer);
-  }, [filters, pathname, router]);
+  }, [filters, pathname, router, search]);
   useEffect(() => {
     let active = true; const timer = window.setTimeout(() => {
       setLoading(true); setError("");

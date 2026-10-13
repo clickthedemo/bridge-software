@@ -22,6 +22,10 @@ export function licenseActions(license: BusinessLicense): LicenseReviewAction[] 
   return [];
 }
 
+export function licenseActionLabel(action: LicenseReviewAction) {
+  return ({ verified: "Approve", correction_required: "Request correction", rejected: "Reject", suspended: "Suspend licence" } as const)[action];
+}
+
 export function actionReasonError(action: DirectoryReviewAction | LicenseReviewAction, reason: string) {
   const needsReason = !["approve", "verified"].includes(action);
   return needsReason && !reason.trim() ? "A reason is required for this action." : null;
