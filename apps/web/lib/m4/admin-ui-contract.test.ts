@@ -32,7 +32,7 @@ test("review reason editors render only after an action is selected", () => {
   const directory = source("../../components/AdminDirectoryReview.tsx");
   const licences = source("../../app/admin/verification/verification-client.tsx");
   assert.match(directory, /pending && pending\.action !== "approve"/);
-  assert.match(licences, /pending && pending\.action !== "verified"/);
+  assert.match(licences, /pending\s*&&\s*pending\.action\s*!==\s*"verified"/);
   assert.match(directory, /Reason \(required\)/);
   assert.match(licences, /Reason \(required\)/);
 });

@@ -2,10 +2,7 @@ import { Router, type Response } from "express";
 
 import { loadApplicationIdentity } from "../../middleware/application-identity.js";
 import { requireAuthentication } from "../../middleware/authentication.js";
-import {
-    requireAnyOrganizationPermission,
-    requirePermission
-} from "../../middleware/authorization.js";
+import { requirePermission } from "../../middleware/authorization.js";
 import {
     validateBody,
     validateParams
@@ -15,7 +12,9 @@ import {
     einIntakeSchema,
     einRevealParamsSchema,
     einVerificationParamsSchema,
-    type EinIntakeInput
+    einVerificationSchema,
+    type EinIntakeInput,
+    type EinVerificationInput
 } from "../../schemas/ein.js";
 import {
     EinServiceError,
@@ -47,6 +46,8 @@ const sendEinError = (res: Response, error: unknown): void => {
         EIN_ENCRYPTION_UNAVAILABLE: 503,
         EIN_DECRYPTION_FAILED: 500,
         EIN_VERIFICATION_NOT_CONFIGURED: 503,
+        EIN_LIVE_LOOKUP_DISABLED: 409,
+        EIN_VERIFICATION_RATE_LIMITED: 429,
         EIN_VERIFICATION_INVALID_STATE: 409,
         EIN_VERIFICATION_FAILED: 502,
         INTERNAL_SERVER_ERROR: 500
@@ -61,6 +62,9 @@ const sendEinError = (res: Response, error: unknown): void => {
         EIN_DECRYPTION_FAILED: "EIN decryption failed.",
         EIN_VERIFICATION_NOT_CONFIGURED:
             "EIN verification is not configured.",
+        EIN_LIVE_LOOKUP_DISABLED: "Live EIN verification is disabled.",
+        EIN_VERIFICATION_RATE_LIMITED:
+            "Too many EIN verification attempts. Retry later.",
         EIN_VERIFICATION_INVALID_STATE:
             "EIN verification cannot start from the current item status.",
         EIN_VERIFICATION_FAILED: "EIN verification could not be completed.",
@@ -144,10 +148,8 @@ router.post(
     requireAuthentication,
     loadApplicationIdentity,
     validateParams(einVerificationParamsSchema),
-    requireAnyOrganizationPermission(
-        "verification:review",
-        "admin:verification_review"
-    ),
+    requirePermission("admin:verification_review"),
+    validateBody(einVerificationSchema),
     async (req, res) => {
         const authentication = req.authentication;
 
@@ -164,9 +166,9 @@ router.post(
                 verificationItemId: string;
             };
             const result = await verifyEin(
-                authentication.accessToken,
                 authentication.user.id,
-                verificationItemId
+                verificationItemId,
+                req.body as EinVerificationInput
             );
             res.status(200).json(result);
         } catch (error) {

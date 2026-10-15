@@ -79,9 +79,9 @@ const envSchema = z.object({
 
     DATABASE_URL: optionalString,
 
-    EIN_VERIFICATION_PROVIDER: optionalString,
+    COBALT_TIN_API_KEY: optionalString,
 
-    EIN_VERIFICATION_API_KEY: optionalString,
+    COBALT_TIN_LIVE_ENABLED: booleanString,
 
     EIN_ENCRYPTION_KEY: optionalEinEncryptionKey,
 
