@@ -2,7 +2,11 @@
     "name": "@thebridge/database",
     "version": "0.1.0",
     "private": true,
+    "scripts": {
+        "migrations:list": "supabase migration list --linked --workdir .",
+        "db:push": "supabase db push --linked --workdir ."
+    },
     "devDependencies": {
-        "supabase": "^2.113.0"
+        "supabase": "^2.119.0"
     }
 }

@@ -45,11 +45,10 @@ export const createListAdminUsersHandler = (
         );
         res.status(200).json(result);
     } catch (error) {
-        const unavailable = error instanceof AdminUserServiceError;
+        const unavailable = error instanceof AdminUserServiceError &&
+            error.code === "ADMIN_USERS_UNAVAILABLE";
         res.status(unavailable ? 503 : 500).json({
-            error: unavailable
-                ? "ADMIN_USERS_UNAVAILABLE"
-                : "INTERNAL_SERVER_ERROR",
+            error: unavailable ? error.code : "INTERNAL_SERVER_ERROR",
             message: unavailable
                 ? "Admin user listing is temporarily unavailable."
                 : "An unexpected error occurred."

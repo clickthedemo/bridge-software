@@ -7,11 +7,18 @@
         "node": ">=24.11.0 <25"
     },
     "scripts": {
-        "dev:web": "pnpm --dir apps/web dev",
-        "dev:api": "pnpm --dir apps/api dev",
-        "build:web": "pnpm --dir apps/web build",
-        "build:api": "pnpm --dir apps/api build",
-        "typecheck:web": "pnpm --dir apps/web typecheck",
-        "typecheck:api": "pnpm --dir apps/api typecheck"
+        "dev": "corepack pnpm --parallel --filter @thebridge/api --filter bridge-software-frontend dev",
+        "dev:web": "corepack pnpm --dir apps/web dev",
+        "dev:api": "corepack pnpm --dir apps/api dev",
+        "build": "corepack pnpm run build:api && corepack pnpm run build:web",
+        "build:web": "corepack pnpm --dir apps/web build",
+        "build:api": "corepack pnpm --dir apps/api build",
+        "typecheck": "corepack pnpm run typecheck:api && corepack pnpm run typecheck:web",
+        "typecheck:web": "corepack pnpm --dir apps/web typecheck",
+        "typecheck:api": "corepack pnpm --dir apps/api typecheck",
+        "lint": "corepack pnpm --dir apps/web lint",
+        "test": "corepack pnpm --dir apps/api test && corepack pnpm --dir apps/web test:integration",
+        "db:migrations:list": "corepack pnpm --filter @thebridge/database migrations:list",
+        "db:push": "corepack pnpm --filter @thebridge/database db:push"
     }
 }

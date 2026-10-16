@@ -5,6 +5,11 @@ const optionalString = z.preprocess(
     z.string().min(1).optional()
 );
 
+const booleanString = z
+    .enum(["true", "false"])
+    .transform((value) => value === "true")
+    .default(false);
+
 const optionalEinEncryptionKey = z.preprocess(
     (value) => (value === "" ? undefined : value),
     z.string().refine((value) => {
@@ -60,6 +65,8 @@ const envSchema = z.object({
         .enum(["development", "test", "staging", "production"])
         .optional(),
 
+    ENABLE_DEVELOPMENT_BOOTSTRAP: booleanString,
+
     SUPABASE_URL: z.url(),
 
     SUPABASE_ANON_KEY: z.string().min(1),
@@ -72,9 +79,9 @@ const envSchema = z.object({
 
     DATABASE_URL: optionalString,
 
-    EIN_VERIFICATION_PROVIDER: optionalString,
+    COBALT_TIN_API_KEY: optionalString,
 
-    EIN_VERIFICATION_API_KEY: optionalString,
+    COBALT_TIN_LIVE_ENABLED: booleanString,
 
     EIN_ENCRYPTION_KEY: optionalEinEncryptionKey,
 

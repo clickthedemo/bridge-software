@@ -27,6 +27,13 @@ const migration = readFileSync(
     ),
     "utf8"
 ).replace(/\s+/g, " ").toLowerCase();
+const phase2fMigration = readFileSync(
+    new URL(
+        "../../../packages/database/supabase/migrations/20261013140000_phase_2f_contact_hardening.sql",
+        import.meta.url
+    ),
+    "utf8"
+).replace(/\s+/g, " ").toLowerCase();
 
 const organizationId = "22222222-2222-4222-8222-222222222222";
 const otherOrganizationId = "33333333-3333-4333-8333-333333333333";
@@ -54,6 +61,7 @@ const validBody = {
     phoneNumber: "+1 (555) 555-1212",
     yearsOfService: 4,
     contactPreference: "email" as const,
+    subject: "Wholesale inquiry",
     message: "Please contact me."
 };
 
@@ -65,12 +73,23 @@ test("contact request body accepts confirmed fields and optional bounded message
     }).success, true);
 });
 
+test("contact creation is approved-only, idempotent, rate limited, and routes admin before owner", () => {
+    assert.match(phase2fMigration, /dp\.status = 'approved'/);
+    assert.match(phase2fMigration, /contact_requests_sender_idempotency_idx/);
+    assert.match(phase2fMigration, /interval '10 minutes'/);
+    const admin = phase2fMigration.indexOf("om.role = 'admin'");
+    const owner = phase2fMigration.indexOf("om.role = 'owner'");
+    assert.ok(admin >= 0 && owner > admin);
+});
+
 test("contact request body rejects invalid identity/contact values", () => {
     assert.equal(createContactRequestSchema.safeParse({ ...validBody, firstName: "" }).success, false);
     assert.equal(createContactRequestSchema.safeParse({ ...validBody, workEmail: "not-email" }).success, false);
     assert.equal(createContactRequestSchema.safeParse({ ...validBody, phoneNumber: "<script>" }).success, false);
     assert.equal(createContactRequestSchema.safeParse({ ...validBody, yearsOfService: 81 }).success, false);
     assert.equal(createContactRequestSchema.safeParse({ ...validBody, contactPreference: "sms" }).success, false);
+    assert.equal(createContactRequestSchema.safeParse({ ...validBody, subject: "" }).success, false);
+    assert.equal(createContactRequestSchema.safeParse({ ...validBody, subject: "x".repeat(201) }).success, false);
     assert.equal(createContactRequestSchema.safeParse({ ...validBody, message: "x".repeat(2001) }).success, false);
 });
 

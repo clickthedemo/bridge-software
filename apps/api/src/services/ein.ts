@@ -1,11 +1,12 @@
+import { createHmac } from "node:crypto";
 import { z } from "zod";
 
 import {
     createAdminSupabaseClient,
-    createUserScopedSupabaseClient,
     SupabaseAdminNotConfiguredError
 } from "../lib/supabase.js";
-import type { EinIntakeInput } from "../schemas/ein.js";
+import { env } from "../config/index.js";
+import type { EinIntakeInput, EinVerificationInput } from "../schemas/ein.js";
 import {
     decryptEin,
     EinDecryptionError,
@@ -13,6 +14,7 @@ import {
     encryptEin
 } from "./ein-encryption.js";
 import {
+    EinLiveLookupDisabledError,
     EinProviderNotConfiguredError,
     getEinVerificationProvider
 } from "./ein-verification-provider.js";
@@ -42,7 +44,13 @@ const requestResultSchema = z.object({
     organization_id: z.uuid(),
     business_id: z.uuid(),
     legal_name: z.string(),
-    verification_item_id: z.uuid()
+    verification_item_id: z.uuid(),
+    should_call_provider: z.boolean(),
+    provider_reference: z.string().nullable(),
+    result_status: z.string().nullable(),
+    result_reason: z.string().nullable(),
+    response_code: z.string().nullable(),
+    completed_at: z.string().nullable()
 });
 
 export type EinFailureCode =
@@ -53,6 +61,8 @@ export type EinFailureCode =
     | "EIN_ENCRYPTION_UNAVAILABLE"
     | "EIN_DECRYPTION_FAILED"
     | "EIN_VERIFICATION_NOT_CONFIGURED"
+    | "EIN_LIVE_LOOKUP_DISABLED"
+    | "EIN_VERIFICATION_RATE_LIMITED"
     | "EIN_VERIFICATION_INVALID_STATE"
     | "EIN_VERIFICATION_FAILED"
     | "INTERNAL_SERVER_ERROR";
@@ -79,6 +89,9 @@ const mapRpcError = (
     }
     if (code === "55000") {
         throw new EinServiceError("EIN_VERIFICATION_INVALID_STATE");
+    }
+    if (code === "P0004") {
+        throw new EinServiceError("EIN_VERIFICATION_RATE_LIMITED");
     }
     throw new EinServiceError("INTERNAL_SERVER_ERROR");
 };
@@ -187,16 +200,22 @@ export const revealEin = async (actorUserId: string, businessId: string) => {
 };
 
 export const verifyEin = async (
-    accessToken: string,
     actorUserId: string,
-    verificationItemId: string
+    verificationItemId: string,
+    input: EinVerificationInput
 ) => {
     let provider;
     try {
-        provider = getEinVerificationProvider();
+        provider = getEinVerificationProvider(input.mode, {
+            apiKey: env.COBALT_TIN_API_KEY,
+            liveEnabled: env.COBALT_TIN_LIVE_ENABLED
+        }, input.mockOutcome);
     } catch (error) {
         if (error instanceof EinProviderNotConfiguredError) {
             throw new EinServiceError("EIN_VERIFICATION_NOT_CONFIGURED");
+        }
+        if (error instanceof EinLiveLookupDisabledError) {
+            throw new EinServiceError("EIN_LIVE_LOOKUP_DISABLED");
         }
         throw new EinServiceError("INTERNAL_SERVER_ERROR");
     }
@@ -223,12 +242,28 @@ export const verifyEin = async (
         throw new EinServiceError("EIN_DECRYPTION_FAILED");
     }
 
-    const client = createUserScopedSupabaseClient(accessToken);
-    const { data, error } = await client
+    const fingerprintKey = env.EIN_ENCRYPTION_KEY;
+    if (!fingerprintKey) {
+        throw new EinServiceError("EIN_ENCRYPTION_UNAVAILABLE");
+    }
+    const normalizedLegalName = secret.data.legal_name
+        .normalize("NFKC")
+        .trim()
+        .replace(/\s+/g, " ")
+        .toUpperCase();
+    const fingerprint = createHmac(
+        "sha256",
+        Buffer.from(fingerprintKey, "base64")
+    ).update(`cobalt-tin-v1\0${input.mode}\0${input.mockOutcome ?? "default"}\0${ein}\0${normalizedLegalName}`).digest("hex");
+
+    const { data, error } = await adminClient
         .rpc("request_ein_verification", {
+            p_actor_user_id: actorUserId,
             p_verification_item_id: verificationItemId,
             p_ein_last_four: secret.data.ein_last_four,
-            p_provider: provider.name
+            p_provider: provider.name,
+            p_provider_mode: input.mode,
+            p_request_fingerprint: fingerprint
         })
         .single();
 
@@ -241,11 +276,30 @@ export const verifyEin = async (
         throw new EinServiceError("INTERNAL_SERVER_ERROR");
     }
 
+    if (!request.data.should_call_provider) {
+        return {
+            verificationItemId: request.data.verification_item_id,
+            provider: provider.name,
+            providerReference: request.data.provider_reference,
+            status: request.data.result_status ?? "checking",
+            reason: request.data.result_reason,
+            responseCode: request.data.response_code,
+            checkedAt: request.data.completed_at,
+            mode: input.mode,
+            reused: true
+        };
+    }
+
     try {
         const result = await provider.verifyEin({
             ein,
             legalName: secret.data.legal_name
         });
+        const itemStatus = result.status === "name_mismatch" ||
+            result.status === "tin_not_issued" ||
+            result.status === "invalid_tin"
+            ? "correction_required"
+            : "in_review";
 
         const { error: completionError } = await adminClient.rpc(
             "complete_ein_verification",
@@ -254,7 +308,8 @@ export const verifyEin = async (
                 p_provider_reference: result.providerReference,
                 p_result_status: result.status,
                 p_result_reason: result.reason,
-                p_item_status: result.status
+                p_response_code: result.responseCode,
+                p_item_status: itemStatus
             }
         );
 
@@ -267,7 +322,11 @@ export const verifyEin = async (
             provider: provider.name,
             providerReference: result.providerReference,
             status: result.status,
-            reason: result.reason
+            reason: result.reason,
+            responseCode: result.responseCode,
+            checkedAt: new Date().toISOString(),
+            mode: input.mode,
+            reused: false
         };
     } catch (error) {
         if (error instanceof EinServiceError) {
@@ -281,7 +340,8 @@ export const verifyEin = async (
                 p_provider_reference: null,
                 p_result_status: "provider_error",
                 p_result_reason: "The provider request could not be completed.",
-                p_item_status: "verification_requested"
+                p_response_code: null,
+                p_item_status: "in_review"
             }
         );
 

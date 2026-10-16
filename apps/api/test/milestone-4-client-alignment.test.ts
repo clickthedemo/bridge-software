@@ -72,12 +72,12 @@ test("contactPreference final enum is email, phone, either", () => {
     for (const contactPreference of ["email", "phone", "either"]) {
         assert.equal(createContactRequestSchema.safeParse({
             firstName: "A", workEmail: "a@example.com", phoneNumber: "+1 555 555 5555",
-            yearsOfService: 2, contactPreference
+            yearsOfService: 2, contactPreference, subject: "Inquiry"
         }).success, true);
     }
     assert.equal(createContactRequestSchema.safeParse({
         firstName: "A", workEmail: "a@example.com", phoneNumber: "+1 555 555 5555",
-        yearsOfService: 2, contactPreference: "sms"
+        yearsOfService: 2, contactPreference: "sms", subject: "Inquiry"
     }).success, false);
 });
 

@@ -14,9 +14,11 @@ process.env.PASSWORD_RESET_REDIRECT_URL = "http://localhost:5173/reset-password"
 const { adminUserInvitationSchema, adminUsersQuerySchema } = await import(
     "../src/schemas/admin-users.js"
 );
-const { AdminUserServiceError, combineAdminUserData } = await import(
-    "../src/services/admin-users.js"
-);
+const {
+    AdminUserServiceError,
+    combineAdminUserData,
+    parseAdminUserRows
+} = await import("../src/services/admin-users.js");
 const { hasPermission, requirePermission } = await import(
     "../src/middleware/authorization.js"
 );
@@ -315,4 +317,39 @@ test("safe projection combines profile and auth state without duplicate users", 
     assert.equal(serialized.includes("encrypted_password"), false);
     assert.equal(serialized.includes("confirmation_token"), false);
     assert.equal(serialized.includes("must-not-leak"), false);
+});
+
+test("admin user rows accept page-manager organization memberships", () => {
+    const rows = parseAdminUserRows({
+        profiles: [],
+        roles: [],
+        memberships: [{
+            user_id: userId,
+            organization_id: organizationOne,
+            role: "page_manager",
+            status: "active",
+            organizations: { id: organizationOne, name: "One" }
+        }]
+    });
+
+    assert.equal(rows.memberships[0]?.role, "page_manager");
+});
+
+test("admin user list maps internal projection failures to HTTP 500", async () => {
+    let status = 0;
+    let body: unknown;
+    await createListAdminUsersHandler(async () => {
+        throw new AdminUserServiceError("INTERNAL_SERVER_ERROR");
+    })(
+        {} as never,
+        {
+            locals: { adminUsersQuery: { page: 1, pageSize: 50 } },
+            status(value: number) { status = value; return this; },
+            json(value: unknown) { body = value; return this; }
+        } as never,
+        (() => undefined) as never
+    );
+
+    assert.equal(status, 500);
+    assert.equal((body as { error: string }).error, "INTERNAL_SERVER_ERROR");
 });
