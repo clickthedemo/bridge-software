@@ -15,6 +15,8 @@ const { putDirectoryProfileSchema } = await import(
     "../src/schemas/directory-profiles.js"
 );
 const {
+    DirectoryProfileServiceError,
+    mapDirectoryProfileWriteError,
     projectProtectedDirectoryProfile,
     projectPublicDirectoryProfile
 } = await import("../src/services/directory-profiles.js");
@@ -183,6 +185,38 @@ test("PUT profile handler scopes the upsert to the requested organization", asyn
     assert.deepEqual(body, { profile: protectedProfile });
 });
 
+test("database validation and authorization errors retain clear API semantics", async () => {
+    for (const [databaseCode, serviceCode, expectedStatus] of [
+        ["23514", "DIRECTORY_PROFILE_VALIDATION_FAILED", 422],
+        ["42501", "DIRECTORY_PROFILE_FORBIDDEN", 403]
+    ] as const) {
+        assert.throws(
+            () => mapDirectoryProfileWriteError(databaseCode),
+            (error) => error instanceof DirectoryProfileServiceError
+                && error.code === serviceCode
+        );
+
+        let status = 0;
+        let body: unknown;
+        await createPutDirectoryProfileHandler(async () => {
+            throw new DirectoryProfileServiceError(serviceCode);
+        })(
+            {
+                authentication: { accessToken: "access-token" },
+                params: { organizationId },
+                body: input
+            } as never,
+            {
+                status(value: number) { status = value; return this; },
+                json(value: unknown) { body = value; return this; }
+            } as never,
+            (() => undefined) as never
+        );
+        assert.equal(status, expectedStatus);
+        assert.equal((body as { error: string }).error, serviceCode);
+    }
+});
+
 test("profile schema rejects protected fields and organization identifiers", () => {
     for (const field of [
         "organizationId",
@@ -254,7 +288,13 @@ test("approved profile cannot switch its verification business", () => {
     );
 });
 
-for (const hiddenStatus of ["draft", "pending_review", "suspended"] as const) {
+for (const hiddenStatus of [
+    "draft",
+    "pending_review",
+    "correction_requested",
+    "rejected",
+    "suspended"
+] as const) {
     test(`${hiddenStatus} profile is not publicly visible`, () => {
         assert.match(
             migration,

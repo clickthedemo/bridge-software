@@ -36,6 +36,7 @@ const sendError = (res: Response, error: unknown): void => {
     const statuses: Record<ContactRequestServiceError["code"], number> = {
         CONTACT_REQUEST_NOT_FOUND: 404,
         CONTACT_REQUEST_INELIGIBLE: 403,
+        CONTACT_REQUEST_RATE_LIMITED: 429,
         CONTACT_REQUEST_INVALID_TRANSITION: 409,
         CONTACT_REQUEST_FAILED: 500
     };
@@ -45,6 +46,8 @@ const sendError = (res: Response, error: unknown): void => {
             ? "Contact request or contactable profile not found."
             : error.code === "CONTACT_REQUEST_INELIGIBLE"
                 ? "Contact request eligibility is not satisfied."
+                : error.code === "CONTACT_REQUEST_RATE_LIMITED"
+                    ? "Too many contact requests were submitted. Try again later."
                 : error.code === "CONTACT_REQUEST_INVALID_TRANSITION"
                     ? "The requested status transition is not allowed."
                     : "The contact request could not be completed."

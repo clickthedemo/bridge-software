@@ -25,12 +25,22 @@ const platformRoleRowSchema = z.object({
 const membershipRowSchema = z.object({
     user_id: z.uuid(),
     organization_id: z.uuid(),
-    role: z.enum(["owner", "admin", "reviewer", "member"]),
+    role: z.enum(["owner", "admin", "page_manager", "reviewer", "member"]),
     status: z.literal("active"),
     organizations: z.object({
         id: z.uuid(),
         name: z.string()
     })
+});
+
+export const parseAdminUserRows = (input: {
+    profiles: unknown;
+    roles: unknown;
+    memberships: unknown;
+}) => ({
+    profiles: z.array(profileRowSchema).parse(input.profiles),
+    roles: z.array(platformRoleRowSchema).parse(input.roles),
+    memberships: z.array(membershipRowSchema).parse(input.memberships)
 });
 
 export type AdminUserFailureCode =
@@ -120,6 +130,32 @@ const isDuplicateInvitation = (error: AdminAuthFailure): boolean => {
     );
 };
 
+const authUserExists = async (
+    client: ReturnType<typeof createAdminSupabaseClient>,
+    email: string
+): Promise<boolean> => {
+    const normalizedEmail = email.toLowerCase();
+    let page = 1;
+    while (true) {
+        const { data, error } = await client.auth.admin.listUsers({
+            page,
+            perPage: 1000
+        });
+        if (error) {
+            throw new AdminUserServiceError("ADMIN_USERS_UNAVAILABLE");
+        }
+        if (
+            data.users.some(
+                (user) => user.email?.toLowerCase() === normalizedEmail
+            )
+        ) {
+            return true;
+        }
+        if (data.users.length < 1000) return false;
+        page += 1;
+    }
+};
+
 export const inviteAdminUser = async (
     actorUserId: string,
     input: AdminUserInvitationInput
@@ -128,13 +164,33 @@ export const inviteAdminUser = async (
     let invitedUserId: string | undefined;
 
     try {
+        if (await authUserExists(client, input.email)) {
+            throw new AdminUserServiceError("ADMIN_USER_ALREADY_EXISTS");
+        }
+        const developmentLinkOnly =
+            env.NODE_ENV === "development" &&
+            env.ENABLE_DEVELOPMENT_BOOTSTRAP;
         const { data: invitationData, error: invitationError } =
-            await client.auth.admin.inviteUserByEmail(input.email, {
-                redirectTo: env.EMAIL_VERIFICATION_REDIRECT_URL,
-                data: { display_name: input.displayName }
-            });
+            developmentLinkOnly
+                ? await client.auth.admin.generateLink({
+                      type: "invite",
+                      email: input.email,
+                      options: {
+                          redirectTo: env.EMAIL_VERIFICATION_REDIRECT_URL,
+                          data: { display_name: input.displayName }
+                      }
+                  })
+                : await client.auth.admin.inviteUserByEmail(input.email, {
+                      redirectTo: env.EMAIL_VERIFICATION_REDIRECT_URL,
+                      data: { display_name: input.displayName }
+                  });
 
         if (invitationError) {
+            console.warn("Supabase administrator invitation failed", {
+                operation: "admin-invite-user",
+                providerCode: invitationError.code ?? "unknown",
+                status: invitationError.status ?? "unknown"
+            });
             if (isDuplicateInvitation(invitationError)) {
                 throw new AdminUserServiceError("ADMIN_USER_ALREADY_EXISTS");
             }
@@ -191,7 +247,7 @@ export const inviteAdminUser = async (
             displayName: input.displayName,
             accountType: input.accountType,
             platformRole: input.platformRole ?? null,
-            invitationSent: true as const
+            invitationSent: !developmentLinkOnly
         };
     } catch (error) {
         if (invitedUserId) {
@@ -262,22 +318,23 @@ export const listAdminUsers = async (query: AdminUsersQuery) => {
         throw new AdminUserServiceError("ADMIN_USERS_UNAVAILABLE");
     }
 
-    const profiles = z.array(profileRowSchema).safeParse(profilesResult.data);
-    const roles = z.array(platformRoleRowSchema).safeParse(rolesResult.data);
-    const memberships = z
-        .array(membershipRowSchema)
-        .safeParse(membershipsResult.data);
-
-    if (!profiles.success || !roles.success || !memberships.success) {
+    let rows: ReturnType<typeof parseAdminUserRows>;
+    try {
+        rows = parseAdminUserRows({
+            profiles: profilesResult.data,
+            roles: rolesResult.data,
+            memberships: membershipsResult.data
+        });
+    } catch {
         throw new AdminUserServiceError("INTERNAL_SERVER_ERROR");
     }
 
     return {
         users: combineAdminUserData(
             authData.users,
-            profiles.data,
-            roles.data,
-            memberships.data
+            rows.profiles,
+            rows.roles,
+            rows.memberships
         ),
         pagination: {
             page: query.page,

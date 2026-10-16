@@ -28,6 +28,9 @@ const migration = readFileSync(
     ),
     "utf8"
 ).replace(/\s+/g, " ").toLowerCase();
+const logoService = readFileSync(
+    new URL("../src/services/directory-profiles.ts", import.meta.url), "utf8"
+).replace(/\s+/g, " ");
 
 const organizationId = "22222222-2222-4222-8222-222222222222";
 const otherOrganizationId = "33333333-3333-4333-8333-333333333333";
@@ -75,6 +78,14 @@ test("logo upload accepts only PNG, JPEG, and WebP up to two MiB", () => {
         contentType: "image/png",
         fileSize: 2 * 1024 * 1024 + 1
     }).success, false);
+});
+
+test("logo completion rejects expired, size-mismatched, MIME-mismatched, and forged image bytes", () => {
+    assert.match(logoService, /Date\.parse\(pending\.data\.expires_at\) <= Date\.now\(\)/);
+    assert.match(logoService, /bytes\.byteLength !== pending\.data\.file_size/);
+    assert.match(logoService, /downloaded\.data\.type !== pending\.data\.content_type/);
+    assert.match(logoService, /hasExpectedLogoSignature\(bytes, pending\.data\.content_type\)/);
+    assert.match(logoService, /remove\(\[pending\.data\.storage_path\]\)/);
 });
 
 test("upload body rejects user-selected filenames, paths, and buckets", () => {

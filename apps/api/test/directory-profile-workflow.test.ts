@@ -39,6 +39,10 @@ const profileMigration = readFileSync(
     ),
     "utf8"
 ).replace(/\s+/g, " ").toLowerCase();
+const serviceSource = readFileSync(
+    new URL("../src/services/directory-profiles.ts", import.meta.url),
+    "utf8"
+);
 
 const userId = "11111111-1111-4111-8111-111111111111";
 const organizationId = "22222222-2222-4222-8222-222222222222";
@@ -159,6 +163,11 @@ test("submission supports draft and correction resubmission but not suspension",
             !workflowMigration.includes("target_profile.status not in ( 'suspended'"),
         true
     );
+});
+
+test("incomplete submissions map check violations to validation responses", () => {
+    assert.match(serviceSource, /error\.code === "23514"[\s\S]*?DIRECTORY_PROFILE_VALIDATION_FAILED/);
+    assert.match(serviceSource, /error\.code === "55000"[\s\S]*?DIRECTORY_PROFILE_INVALID_STATE/);
 });
 
 test("correction, rejection, and suspension require a bounded reason", () => {

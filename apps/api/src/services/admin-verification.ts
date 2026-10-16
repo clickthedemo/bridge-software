@@ -29,7 +29,15 @@ const queueRowSchema = z.object({
     case_submitted_at: nullableTimestamp,
     item_created_at: z.string(),
     item_updated_at: z.string(),
-    item_reviewed_at: nullableTimestamp
+    item_reviewed_at: nullableTimestamp,
+    ein_check_state: z.enum([
+        "not_checked", "checking", "match", "no_match", "incomplete", "unavailable"
+    ]),
+    ein_check_mode: z.enum(["mock", "live"]).nullable(),
+    ein_last_checked_at: nullableTimestamp,
+    ein_safe_reason: z.string().nullable(),
+    ein_response_code: z.string().nullable(),
+    ein_provider_reference: z.string().nullable()
 });
 
 const historySchema = z.object({
@@ -232,7 +240,13 @@ export const listAdminVerificationQueue = async (
         caseSubmittedAt: row.case_submitted_at,
         itemCreatedAt: row.item_created_at,
         itemUpdatedAt: row.item_updated_at,
-        reviewedAt: row.item_reviewed_at
+        reviewedAt: row.item_reviewed_at,
+        einCheckState: row.ein_check_state,
+        einCheckMode: row.ein_check_mode,
+        einLastCheckedAt: row.ein_last_checked_at,
+        einSafeReason: row.ein_safe_reason,
+        einResponseCode: row.ein_response_code,
+        einProviderReference: row.ein_provider_reference
     }));
 };
 

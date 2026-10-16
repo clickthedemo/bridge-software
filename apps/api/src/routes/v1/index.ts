@@ -6,9 +6,12 @@ import { authRouter } from "./auth.js";
 import { businessesRouter } from "./businesses.js";
 import { contactRequestsRouter } from "./contact-requests.js";
 import { directoryProfilesRouter } from "./directory-profiles.js";
+import { developmentBootstrapRouter } from "./development-bootstrap.js";
 import { einRouter } from "./ein.js";
 import { notificationsRouter } from "./notifications.js";
 import { organizationsRouter } from "./organizations.js";
+import { organizationMembersRouter } from "./organization-members.js";
+import { organizationLocationsRouter } from "./organization-locations.js";
 import { sessionRouter } from "./session.js";
 import { systemRouter } from "./system.js";
 
@@ -23,11 +26,14 @@ router.get("/", (_req, res) => {
 });
 
 router.use(systemRouter);
+router.use(developmentBootstrapRouter);
 router.use("/auth", authRouter);
 router.use("/session", sessionRouter);
 router.use("/admin", adminVerificationRouter);
 router.use("/admin", adminDirectoryProfilesRouter);
 router.use("/organizations", organizationsRouter);
+router.use(organizationMembersRouter);
+router.use(organizationLocationsRouter);
 router.use(businessesRouter);
 router.use(contactRequestsRouter);
 router.use(directoryProfilesRouter);

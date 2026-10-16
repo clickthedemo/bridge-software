@@ -11,7 +11,7 @@ process.env.EMAIL_VERIFICATION_REDIRECT_URL =
 process.env.PASSWORD_RESET_REDIRECT_URL = "http://localhost:5173/reset-password";
 
 const { hasPermission } = await import("../src/middleware/authorization.js");
-const { createBusinessSchema } = await import("../src/schemas/businesses.js");
+const { createBusinessSchema, putBusinessLicenseSchema, updateBusinessSchema } = await import("../src/schemas/businesses.js");
 const { projectBusinessRow } = await import("../src/services/businesses.js");
 const {
     createCreateBusinessHandler,
@@ -43,6 +43,8 @@ const business = {
     organizationId,
     legalName: "Example Business LLC",
     dbaName: "Example Business",
+    websiteUrl: "https://example.test",
+    employeeCount: 12,
     status: "active" as const,
     createdAt: "2026-10-05T10:00:00.000Z",
     updatedAt: "2026-10-05T10:00:00.000Z"
@@ -106,7 +108,7 @@ test("business creation uses the requested organization linkage", async () => {
     let receivedOrganizationId: string | undefined;
     let status = 0;
     let body: unknown;
-    const input = { legalName: business.legalName, dbaName: business.dbaName };
+    const input = { legalName: business.legalName, dbaName: business.dbaName, websiteUrl: business.websiteUrl, employeeCount: business.employeeCount };
 
     await createCreateBusinessHandler(async (
         accessToken,
@@ -151,6 +153,8 @@ test("business creation rejects verification-owned and unknown fields", () => {
     for (const field of protectedFields) {
         const result = createBusinessSchema.safeParse({
             legalName: business.legalName,
+            websiteUrl: business.websiteUrl,
+            employeeCount: business.employeeCount,
             [field]: "forged"
         });
         assert.equal(result.success, false, `${field} must be rejected`);
@@ -197,6 +201,8 @@ test("business response projection excludes verification secrets and evidence", 
         organization_id: organizationId,
         legal_name: business.legalName,
         dba_name: business.dbaName,
+        website_url: business.websiteUrl,
+        employee_count: business.employeeCount,
         status: "active",
         created_at: business.createdAt,
         updated_at: business.updatedAt,
@@ -221,6 +227,27 @@ test("business response projection excludes verification secrets and evidence", 
     }
 });
 
+test("business website and employee count validation is bounded", () => {
+    assert.equal(updateBusinessSchema.safeParse({ websiteUrl: "https://example.test", employeeCount: 1 }).success, true);
+    for (const input of [
+        { websiteUrl: "http://example.test", employeeCount: 1 },
+        { websiteUrl: "not-a-url", employeeCount: 1 },
+        { websiteUrl: "https://example.test", employeeCount: 0 },
+        { websiteUrl: "https://example.test", employeeCount: -1 },
+        { websiteUrl: "https://example.test", employeeCount: 1_000_001 },
+        { websiteUrl: "https://example.test", employeeCount: 1, unknown: true }
+    ]) assert.equal(updateBusinessSchema.safeParse(input).success, false);
+});
+
+test("business licence input accepts authoritative fields and rejects unknown data", () => {
+    assert.deepEqual(putBusinessLicenseSchema.parse({
+        licenseNumber: "QA-123", licenseType: "adult_use", issuingState: "or", expiresOn: "2027-10-13"
+    }), { licenseNumber: "QA-123", licenseType: "adult_use", issuingState: "OR", expiresOn: "2027-10-13" });
+    assert.equal(putBusinessLicenseSchema.safeParse({
+        licenseNumber: "QA-123", licenseType: "retail", issuingState: "OR", expiresOn: "2027-10-13"
+    }).success, false);
+});
+
 test("business insert RLS permits only admins and empty verification-owned fields", () => {
     const migration = readFileSync(
         new URL(
@@ -242,4 +269,21 @@ test("business insert RLS permits only admins and empty verification-owned field
     assert.match(migration, /ein_last_four is null/);
     assert.match(migration, /cannabis_license_number is null/);
     assert.match(migration, /cannabis_license_state is null/);
+});
+
+test("business licence migration enforces lifecycle, tenant security, and readiness", () => {
+    const migration = readFileSync(new URL(
+        "../../../packages/database/supabase/migrations/20261013150000_milestone_4_business_license_contracts.sql",
+        import.meta.url
+    ), "utf8").replace(/\s+/g, " ").toLowerCase();
+
+    assert.match(migration, /create table public\.business_licenses/);
+    assert.match(migration, /'pending', 'verified', 'rejected', 'expired', 'suspended'/);
+    assert.match(migration, /not public\.is_organization_admin\(p_organization_id\)/);
+    assert.match(migration, /administrators cannot review their own organization/);
+    assert.match(migration, /p_action <> 'verified'.*review reason is required/);
+    assert.match(migration, /license\.status <> 'verified'.*'license_verified'/);
+    assert.match(migration, /license\.expires_on <= current_date.*'license_expiration'/);
+    assert.match(migration, /organization\.organization_type in \('retailer','dispensary'\)/);
+    assert.match(migration, /insert into public\.audit_logs/);
 });
